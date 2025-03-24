@@ -10,6 +10,16 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
+    // public function index() {
+    //     $user = Auth::user();
+
+    //     return match ($user->role) {
+    //         'admin' => view('admin.dashboard'),
+    //         'staff' => view('staff.dashboard'),
+    //         default => abort(403, 'You do not have permission to access this resource.'),
+    //     };
+    // }
+
     private const ROLE_ADMIN = 'admin';
     private const ROLE_STAFF = 'staff';
 

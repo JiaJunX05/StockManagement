@@ -30,7 +30,7 @@
                         </a>
                     </li>
                     <li>
-                        <a class="accordion-item nav-link text-white" href="">
+                        <a class="accordion-item nav-link text-white" href="{{ route('user.list') }}">
                             <i class="bi bi-ui-checks me-2"></i>
                             <span class="link-text fw-bold">Staff List</span>
                         </a>
@@ -48,13 +48,13 @@
                 </button>
                 <ul id="category" class="list-unstyled collapse">
                     <li>
-                        <a class="accordion-item nav-link text-white" href="">
+                        <a class="accordion-item nav-link text-white" href="{{ route('category.create') }}">
                             <i class="bi bi-tags-fill me-2"></i>
                             <span class="link-text fw-bold">Add Category</span>
                         </a>
                     </li>
                     <li>
-                        <a class="accordion-item nav-link text-white" href="">
+                        <a class="accordion-item nav-link text-white" href="{{ route('category.list') }}">
                             <i class="bi bi-ui-checks me-2"></i>
                             <span class="link-text fw-bold">Category List</span>
                         </a>
@@ -63,24 +63,72 @@
             </li>
 
             <li class="nav-item">
-                <button class="nav-link w-100 text-white d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#image">
+                <button class="nav-link w-100 text-white d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#zone">
                     <div>
-                        <i class="bi bi-images me-2" style="font-size: 1.2rem;"></i>
-                        <span class="link-text fw-bold">Image</span>
+                        <i class="bi bi-geo-alt me-2" style="font-size: 1.2rem;"></i>
+                        <span class="link-text fw-bold">Zone</span>
                     </div>
                     <i class="bi bi-chevron-down"></i>
                 </button>
-                <ul id="image" class="list-unstyled collapse">
+                <ul id="zone" class="list-unstyled collapse">
                     <li>
-                        <a class="accordion-item nav-link text-white" href="">
-                            <i class="bi bi-images me-2"></i>
-                            <span class="link-text fw-bold">Add Image</span>
+                        <a class="accordion-item nav-link text-white" href="{{ route('zone.create') }}">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            <span class="link-text fw-bold">Add Zone</span>
                         </a>
                     </li>
                     <li>
-                        <a class="accordion-item nav-link text-white" href="">
-                            <i class="bi bi-ui-checks me-2"></i>
-                            <span class="link-text fw-bold">Image List</span>
+                        <a class="accordion-item nav-link text-white" href="{{ route('zone.list') }}">
+                            <i class="bi bi-list-ul me-2"></i>
+                            <span class="link-text fw-bold">Zone List</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <button class="nav-link w-100 text-white d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#rack">
+                    <div>
+                        <i class="bi bi-grid me-2" style="font-size: 1.2rem;"></i>
+                        <span class="link-text fw-bold">Rack</span>
+                    </div>
+                    <i class="bi bi-chevron-down"></i>
+                </button>
+                <ul id="rack" class="list-unstyled collapse">
+                    <li>
+                        <a class="accordion-item nav-link text-white" href="{{ route('rack.create') }}">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            <span class="link-text fw-bold">Add Rack</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="accordion-item nav-link text-white" href="{{ route('rack.list') }}">
+                            <i class="bi bi-list-ul me-2"></i>
+                            <span class="link-text fw-bold">Rack List</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <button class="nav-link w-100 text-white d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#storack">
+                    <div>
+                        <i class="bi bi-box-seam me-2" style="font-size: 1.2rem;"></i>
+                        <span class="link-text fw-bold">Storack</span>
+                    </div>
+                    <i class="bi bi-chevron-down"></i>
+                </button>
+                <ul id="storack" class="list-unstyled collapse">
+                    <li>
+                        <a class="accordion-item nav-link text-white" href="{{ route('storack.create') }}">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            <span class="link-text fw-bold">Add Storack</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="accordion-item nav-link text-white" href="{{ route('storack.list') }}">
+                            <i class="bi bi-list-ul me-2"></i>
+                            <span class="link-text fw-bold">Storack List</span>
                         </a>
                     </li>
                 </ul>
@@ -89,21 +137,34 @@
             <li class="nav-item">
                 <button class="nav-link w-100 text-white d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#product">
                     <div>
-                        <i class="bi bi-box-fill me-2" style="font-size: 1.2rem;"></i>
+                        <i class="bi bi-box-seam me-2" style="font-size: 1.2rem;"></i>
                         <span class="link-text fw-bold">Product</span>
                     </div>
                     <i class="bi bi-chevron-down"></i>
                 </button>
                 <ul id="product" class="list-unstyled collapse">
                     <li>
-                        <a class="accordion-item nav-link text-white" href="">
-                            <i class="bi bi-ui-checks me-2"></i>
+                        <a class="accordion-item nav-link text-white" href="{{ route('product.create') }}">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            <span class="link-text fw-bold">Add Product</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="accordion-item nav-link text-white" href="{{ route('product.list') }}">
+                            <i class="bi bi-card-list me-2"></i>
                             <span class="link-text fw-bold">Product List</span>
                         </a>
                     </li>
                 </ul>
             </li>
         </ul>
+
+        <form action="{{ route('logout') }}" method="POST">
+            @csrf
+            <button type="submit" class="btn btn-outline-danger d-flex align-items-center gap-2 fw-bold w-100">
+                <i class="bi bi-box-arrow-right me-2"></i> Sign Out
+            </button>
+        </form>
     </div>
 </aside>
 

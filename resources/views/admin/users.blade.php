@@ -3,9 +3,6 @@
 @section("title", "Admin Panel")
 @section("content")
 
-<!-- JQuery CDN -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-
 <div class="container text-center mt-5">
      <!-- Success Alert -->
     @if(session('success'))
@@ -74,7 +71,7 @@
         const $searchInput = $("#search-input");
 
         function fetchUsers(page = 1, search = "") {
-            $.get("{{ route('users') }}", { page, search }, function (response) {
+            $.get("{{ route('user.list') }}", { page, search }, function (response) {
                 if (response.data.length > 0) {
                     $tableBody.html(response.data.map(user => `
                         <tr>
@@ -85,7 +82,7 @@
                             <td class="text-nowrap text-center">
                                 <a href="#" class="btn btn-success btn-sm" style="width: 100px;">Change Role</a>
                                 <a href="#" class="btn btn-warning btn-sm mx-1" style="width: 100px;">Edit</a>
-                                <a href="#" class="btn btn-danger btn-sm mx-1" style="width: 100px;" onclick="return confirm('Are you sure?')">Delete</a>
+                                <a href="#" class="btn btn-danger btn-sm mx-1" style="width: 100px;" onclick="return confirm('Are you sure you want to delete this Staff?')">Delete</a>
                             </td>
                         </tr>
                     `).join(""));

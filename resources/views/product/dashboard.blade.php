@@ -1,6 +1,6 @@
-@extends("staff.layouts.app")
+@extends("admin.layouts.app")
 
-@section("title", "Staff Panel")
+@section("title", "Admin Panel")
 @section("content")
 
 <div class="container text-center mt-5">
@@ -12,20 +12,20 @@
         </div>
     @endif
 
-    <h3 class="text-md-start">Product List Management</h3><hr>
+    <div class="container">
+        <div class="row justify-content-between align-items-center mb-3">
+            <div class="col-12 col-md-6 mb-2 mb-md-0 text-md-start">
+                <h3 class="mb-0">Product List Management</h3>
+            </div>
 
-    <div class="mb-3">
-        <div class="text-md-end">
-            <div class="card shadow-sm" style="all: unset;">
-                <div class="card-body p-3">
-                    <form class="d-flex gap-3 align-items-center" role="search" id="search-form">
-                        <div class="input-group flex-grow-1">
-                            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-                            <input class="form-control border-start-0" type="search" placeholder="Search by SKU..." aria-label="Search" id="search-input" autofocus>
-                            <button class="btn btn-outline-primary" type="submit" style="width: 150px;">Search</button>
-                        </div>
-                    </form>
-                </div>
+            <div class="col-12 col-md-6 text-md-end">
+                <form class="d-flex justify-content-md-end" role="search" id="search-form">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input class="form-control" type="search" placeholder="Search by SKU..." aria-label="Search" id="search-input" autofocus>
+                        <button class="btn btn-outline-success" type="submit">Search</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -63,7 +63,7 @@
 
         function loadTable(page) {
             $.ajax({
-                url: "{{ route('list') }}",
+                url: "{{ route('product.list') }}",
                 type: 'GET',
                 data: {
                     page: page,
