@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('storacks', function (Blueprint $table) {
+        Schema::create('colors', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('zone_id')->constrained('zones')->onDelete('cascade');
-            $table->foreignId('rack_id')->constrained('racks')->onDelete('cascade');
+            $table->string('color_name', 255)->unique();
+            $table->string('hex_code', 7)->unique();
             $table->timestamps();
-
-            $table->unique(['zone_id', 'rack_id']); // 确保同一个 Zone 里的 Rack Number 唯一
         });
     }
 
@@ -26,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('storacks');
+        Schema::dropIfExists('colors');
     }
 };

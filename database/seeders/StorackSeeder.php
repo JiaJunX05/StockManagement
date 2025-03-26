@@ -19,7 +19,7 @@ class StorackSeeder extends Seeder
     {
         // 获取正确的 Zone 和 Rack
         $zones = Zone::whereIn('zone_name', array_map(fn($letter) => "Zone $letter", range('A', 'E')))->get();
-        $racks = Rack::whereIn('rack_number', array_map(fn($number) => "rack$number", range(1, 5)))->get();
+        $racks = Rack::whereIn('rack_number', array_map(fn($number) => "Rack $number", range(1, 5)))->get();
 
         // 生成 Storack 记录
         foreach ($zones as $zone) {

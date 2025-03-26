@@ -11,23 +11,13 @@ use App\Models\Zone;
 class StorackController extends Controller
 {
     public function index(Request $request) {
-        // 获取所有区域和货架数据（用于下拉框）
-        $zones = Zone::all();
-        $racks = Rack::all();
-
         // 处理 AJAX 请求
         if ($request->ajax()) {
-            // 查询 Storack 数据，预加载 Zone 和 Rack 关联
-            $query = Storack::with(['zone', 'rack']);
+            $query = Storack::with(['zone', 'rack']); // 预加载 Zone 和 Rack 关联
 
-            // Zone 过滤
-            if ($request->filled('zone_id')) {
-                $query->where('zone_id', $request->input('zone_id'));
-            }
-
-            // Rack 过滤
-            if ($request->filled('rack_id')) {
-                $query->where('rack_id', $request->input('rack_id'));
+            // 机架筛选
+            if ($request->filled('filter') && $request->input('filter') !== '') {
+                $query->where('id', $request->input('filter'));
             }
 
             // 分页参数
@@ -37,21 +27,35 @@ class StorackController extends Controller
             // 获取分页数据
             $storacks = $query->paginate($perPage, ['*'], 'page', $page);
 
+            // 计算分页显示信息
+            $total = $storacks->total();
+            $start = $total > 0 ? ($storacks->currentPage() - 1) * $perPage + 1 : 0;
+            $end = min($start + $perPage - 1, $total);
+
             // 返回 DataTables 兼容的 JSON 响应
             return response()->json([
-                'draw' => $request->input('draw'),
-                'recordsTotal' => $storacks->total(),
-                'recordsFiltered' => $storacks->total(),
                 'data' => $storacks->items(),
                 'current_page' => $storacks->currentPage(),
                 'last_page' => $storacks->lastPage(),
-                'total' => $storacks->total(),
+                'total' => $total,
+                'per_page' => $perPage,
+                'from' => $start,
+                'to' => $end,
+                'pagination' => [
+                    'showing_start' => $start,
+                    'showing_end' => $end,
+                    'total_count' => $total,
+                    'has_more_pages' => $storacks->hasMorePages(),
+                    'is_first_page' => $storacks->onFirstPage(),
+                    'is_last_page' => $storacks->currentPage() === $storacks->lastPage()
+                ],
             ]);
         }
 
         // 非 AJAX 请求，返回初始视图
-        $storacks = Storack::with(['zone', 'rack'])->get();
-        return view('storack.dashboard', compact('storacks', 'zones', 'racks'));
+        $zones = Zone::all(); // 获取所有区域数据（用于下拉框）
+        $racks = Rack::all(); // 获取所有货架数据（用于下拉框）
+        return view('storack.dashboard', compact('zones', 'racks'));
     }
 
     public function showCreateForm() {
@@ -80,7 +84,7 @@ class StorackController extends Controller
             'rack_id' => $request->rack_id,
         ]);
 
-        return redirect()->route('storack.list')->with('success', 'Storack created successfully');
+        return redirect()->route('storacks')->with('success', 'Storack created successfully');
     }
 
     public function showUpdateForm($id) {
@@ -112,13 +116,17 @@ class StorackController extends Controller
         $storacks->rack_id = $request->rack_id;
         $storacks->save();
 
-        return redirect()->route('storack.list')->with('success', 'Storack updated successfully');
+        return redirect()->route('storacks')->with('success', 'Storack updated successfully');
     }
 
     public function destroy($id) {
         $storacks = Storack::findOrFail($id);
         $storacks->delete();
 
-        return redirect()->route('storack.list')->with('success', 'Storack deleted successfully.');
+        if ($storacks->products()->exists()) {
+            return redirect()->route('storacks')->withErrors(['error' => 'Cannot delete this storack because products are still linked to it.']);
+        }
+
+        return redirect()->route('storacks')->with('success', 'Storack deleted successfully.');
     }
 }

@@ -14,12 +14,15 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('feature', 255)->default('default.jpg');
-            $table->string('name')->unique();
+            $table->string('name', 255);
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2);
             $table->unsignedInteger('quantity')->default(0);
             $table->string('sku_code')->unique();
             $table->foreignId('category_id')->nullable()->constrained('categories')->onDelete('set null');
+            $table->foreignId('subcategory_id')->nullable()->constrained('subcategories')->onDelete('set null');
+            $table->foreignId('brand_id')->nullable()->constrained('brands')->onDelete('set null');
+            $table->foreignId('color_id')->nullable()->constrained('colors')->onDelete('set null');
             $table->foreignId('zone_id')->nullable()->constrained('zones')->onDelete('set null');
             $table->foreignId('rack_id')->nullable()->constrained('racks')->onDelete('set null');
             $table->timestamps();

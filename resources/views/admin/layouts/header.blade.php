@@ -19,20 +19,32 @@
         <div class="collapse navbar-collapse" id="navbarToggler">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <!-- Staff -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('users') }}">
+                        <i class="bi bi-people-fill menu-icon me-2"></i><span>Staff</span>
+                    </a>
+                </li>
+
+                <!-- Storage -->
                 <li class="nav-item dropdown menu-item">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-people-fill menu-icon me-2"></i><span>Staff</span>
+                        <i class="bi bi-grid-fill menu-icon me-2"></i><span>Storage</span>
                     </a>
                     <ul class="dropdown-menu custom-dropdown">
                         <li>
-                            <a class="dropdown-item" href="{{ route('register') }}">
-                                <i class="bi bi-person-plus-fill me-2"></i><span>Add Staff</span>
+                            <a class="dropdown-item" href="{{ route('zones') }}">
+                                <i class="bi bi-map-fill me-2"></i> </i><span>Zones</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('racks') }}">
+                                <i class="bi bi-columns-gap me-2"></i></i><span>Racks</span>
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
-                            <a class="dropdown-item" href="{{ route('user.list') }}">
-                                <i class="bi bi-people me-2"></i><span>Staff List</span>
+                            <a class="dropdown-item" href="{{ route('storacks') }}">
+                                <i class="bi bi-layout-wtf me-2"></i></i><span>Storacks</span>
                             </a>
                         </li>
                     </ul>
@@ -58,27 +70,9 @@
                     </ul>
                 </li>
 
-                <!-- Zone -->
-                <li class="nav-item dropdown menu-item">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-grid-fill menu-icon me-2"></i><span>Zone</span>
-                    </a>
-                    <ul class="dropdown-menu custom-dropdown">
-                        <li>
-                            <a class="dropdown-item" href="{{ route('zone.create') }}">
-                                <i class="bi bi-plus-square-fill me-2"></i><span>Add Zone</span>
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="{{ route('zone.list') }}">
-                                <i class="bi bi-list-ul me-2"></i><span>Zone List</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
 
-                <!-- Rack -->
+
+                {{-- <!-- Rack -->
                 <li class="nav-item dropdown menu-item">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-box-seam menu-icon me-2"></i><span>Rack</span>
@@ -116,7 +110,7 @@
                             </a>
                         </li>
                     </ul>
-                </li>
+                </li> --}}
 
                 <!-- Product -->
                 <li class="nav-item dropdown menu-item">
@@ -144,7 +138,7 @@
                 <li class="nav-item">
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
-                        
+
                         <button type="submit" class="btn custom-logout-btn">
                             <i class="bi bi-box-arrow-right me-2"></i><span>Sign Out</span>
                         </button>

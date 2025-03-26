@@ -3,166 +3,248 @@
 @section("title", "Admin Panel")
 @section("content")
 
-<div class="container text-center mt-5">
-    <!-- Success Alert -->
+<link rel="stylesheet" href="{{ asset('assets/css/storacks.css') }}">
+<div class="container py-4">
+    <!-- 提示信息 -->
     @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
+        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     @endif
 
-    <!-- Error Alert -->
     @if($errors->any())
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @foreach ($errors->all() as $error)
-            <div>{{ $error }}</div>
-        @endforeach
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
+        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @foreach ($errors->all() as $error)
+                <div>{{ $error }}</div>
+            @endforeach
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     @endif
 
-    <div class="d-flex justify-content-between align-items-center">
-        <h3 class="text-md-start mb-0">Storack List Management</h3>
+    <!-- 页面标题和功能区 -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <div class="row justify-content-between align-items-center g-3">
+                <!-- 左侧标题 -->
+                <div class="col-12 col-md-6">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                            <i class="bi bi-geo-alt-fill text-primary fs-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="mb-0 fw-bold">Storack List Management</h3>
+                            <p class="text-muted mb-0">Manage your storacks</p>
+                        </div>
+                    </div>
+                </div>
 
-        <form class="d-flex gap-3 align-items-center" role="search" id="search-form">
-            <select class="form-select" id="zone_id" name="zone_id" style="width: 150px;">
-                <option selected value="">Select a Zone</option>
-                @foreach($zones as $zone)
-                    <option value="{{ $zone->id }}">{{ strtoupper($zone->zone_name) }}</option>
-                @endforeach
-            </select>
-
-            <select class="form-select" id="rack_id" name="rack_id" style="width: 150px;">
-                <option selected value="">Select a Rack</option>
-                @foreach($racks as $rack)
-                    <option value="{{ $rack->id }}">{{ strtoupper($rack->rack_number) }}</option>
-                @endforeach
-            </select>
-        </form>
+                <!-- 右侧功能区 -->
+                <div class="col-12 col-md-6">
+                    <div class="d-flex justify-content-end align-items-center gap-3">
+                        <select class="form-select" id="zone-filter" name="zone_id" style="width: auto; min-width: 200px;">
+                            <option value="">All Zones</option>
+                            @foreach($zones as $zone)
+                                <option value="{{ $zone->id }}">{{ strtoupper($zone->zone_name) }}</option>
+                            @endforeach
+                        </select>
+                        <select class="form-select" id="rack-filter" name="rack_id" style="width: auto; min-width: 200px;">
+                            <option value="">All Racks</option>
+                            @foreach($racks as $rack)
+                                <option value="{{ $rack->id }}">{{ strtoupper($rack->rack_number) }}</option>
+                            @endforeach
+                        </select>
+                        <a href="{{ route('storack.create') }}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle-fill me-2"></i>
+                            Add Storack
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <hr>
 
-    <div class="table-responsive shadow-sm rounded-3">
-        <table class="table table-hover table-striped">
-            <thead class="table-dark" style="position: sticky; top: 0; z-index: 1;">
-                <tr>
-                    <th scope="col" class="fw-bold col-1">ID</th>
-                    <th scope="col" class="fw-bold col-4">Zone Name</th>
-                    <th scope="col" class="fw-bold col-4">Rack Number</th>
-                    <th scope="col" colspan="2" class="fw-bold col-3">Action</th>
-                </tr>
-            </thead>
-            <tbody id="table-body"></tbody>
-        </table>
-
-        <div id="no-results" class="text-center py-3" style="display: none;">No results found.</div>
+    <!-- 机架列表表格 -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table custom-table mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4" style="width: 10%"><div class="table-header">ID</div></th>
+                            <th style="width: 40%"><div class="table-header">Zone Name</div></th>
+                            <th style="width: 40%"><div class="table-header">Rack Number</div></th>
+                            <th class="text-end pe-4" style="width: 10%"><div class="table-header">Actions</div></th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
-    <!-- Pagination -->
-    <nav aria-label="Page navigation example" class="d-flex justify-content-center mt-3">
-        <ul id="pagination" class="pagination"></ul>
-    </nav>
+    <!-- 分页和结果统计 -->
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <div class="pagination-info text-muted">
+            Showing <span class="fw-medium" id="showing-start">0</span>
+            to <span class="fw-medium" id="showing-end">0</span>
+            of <span class="fw-medium" id="total-count">0</span> entries
+        </div>
+        <nav aria-label="Page navigation">
+            <ul id="pagination" class="pagination pagination-sm mb-0">
+                <li class="page-item disabled" id="prev-page">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+                <li class="page-item disabled" id="next-page">
+                    <a class="page-link" href="#" aria-label="Next">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
 </div>
 
 <script>
-    $(document).ready(function() {
-        let currentZone = '';
-        let currentRack = '';
+$(document).ready(function () {
+    const $tableBody = $("#table-body");
+    const $pagination = $("#pagination");
+    const $zoneFilter = $("#zone-filter");
+    const $rackFilter = $("#rack-filter");
+    const $prevPage = $("#prev-page");
+    const $nextPage = $("#next-page");
+    const $showingStart = $("#showing-start");
+    const $showingEnd = $("#showing-end");
+    const $totalCount = $("#total-count");
 
-        // 初始加载表格
-        loadTable(1);
-
-        // 选择框变化时触发搜索
-        $('#zone_id, #rack_id').on('change', function() {
-            currentZone = $('#zone_id').val();
-            currentRack = $('#rack_id').val();
-            loadTable(1);
+    function fetchStoracks(page = 1, zone = "", rack = "") {
+        $.get("{{ route('storacks') }}", {
+            page,
+            zone_id: zone,
+            rack_id: rack,
+            perPage: 10
+        }, function (response) {
+            if (response.data.length > 0) {
+                renderStoracks(response.data);
+                updatePaginationInfo(response);
+            } else {
+                showNoResults();
+            }
+            generatePagination(response);
         });
+    }
 
-        function loadTable(page) {
-            $.ajax({
-                url: "{{ route('storack.list') }}",
-                type: 'GET',
-                data: {
-                    page: page,
-                    zone_id: currentZone,
-                    rack_id: currentRack,
-                    length: 10
-                },
-                success: function(response) {
-                    renderTable(response.data);
-                    renderPagination(response.current_page, response.last_page);
-                    $('#no-results').toggle(response.data.length === 0);
-                },
-                error: function(xhr) {
-                    console.error('Error loading storacks:', xhr);
+    function renderStoracks(storacks) {
+        $tableBody.html(storacks.map(storack => `
+            <tr>
+                <td class="ps-4"><span class="text-muted">#${storack.id}</span></td>
+                <td><span class="fw-medium">${storack.zone ? storack.zone.zone_name.toUpperCase() : 'N/A'}</span></td>
+                <td><span class="fw-medium">${storack.rack ? storack.rack.rack_number.toUpperCase() : 'N/A'}</span></td>
+                <td class="text-end pe-4">
+                    <div class="action-buttons">
+                        <a href="{{ route('storack.update', '') }}/${storack.id}" class="btn-action" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <form action="{{ route('storack.destroy', '') }}/${storack.id}" method="POST" style="display: inline-block;" onsubmit="return confirm('Are you sure you want to delete this storack?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn-action delete" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        `).join(""));
+    }
+
+    function updatePaginationInfo(response) {
+        const start = (response.current_page - 1) * response.per_page + 1;
+        const end = Math.min(start + response.per_page - 1, response.total);
+
+        $showingStart.text(response.total > 0 ? start : 0);
+        $showingEnd.text(end);
+        $totalCount.text(response.total);
+    }
+
+    function showNoResults() {
+        $tableBody.empty();
+        $showingStart.text('0');
+        $showingEnd.text('0');
+        $totalCount.text('0');
+    }
+
+    function generatePagination(data) {
+        $("#pagination li:not(#prev-page):not(#next-page)").remove();
+
+        let paginationHTML = '';
+
+        $prevPage.toggleClass('disabled', data.current_page === 1);
+
+        if (data.last_page > 7) {
+            for (let i = 1; i <= data.last_page; i++) {
+                if (i === 1 || i === data.last_page ||
+                    (i >= data.current_page - 1 && i <= data.current_page + 1)) {
+                    paginationHTML += `
+                        <li class="page-item ${i === data.current_page ? 'active' : ''}">
+                            <a class="page-link pagination-btn" href="#" data-page="${i}">${i}</a>
+                        </li>`;
+                } else if (i === data.current_page - 2 || i === data.current_page + 2) {
+                    paginationHTML += `
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>`;
                 }
-            });
+            }
+        } else {
+            for (let i = 1; i <= data.last_page; i++) {
+                paginationHTML += `
+                    <li class="page-item ${i === data.current_page ? 'active' : ''}">
+                        <a class="page-link pagination-btn" href="#" data-page="${i}">${i}</a>
+                    </li>`;
+            }
         }
 
-        function renderTable(data) {
-            let tableBody = $('#table-body');
-            tableBody.empty();
+        $prevPage.after(paginationHTML);
+        $nextPage.toggleClass('disabled', data.current_page === data.last_page);
+    }
 
-            data.forEach(storack => {
-                tableBody.append(`
-                    <tr>
-                        <td>${storack.id}</td>
-                        <td>Zone: ${storack.zone ? storack.zone.zone_name.toUpperCase() : 'N/A'}</td>
-                        <td>Rack: ${storack.rack ? storack.rack.rack_number.toUpperCase() : 'N/A'}</td>
-                        <td><a href="{{ route('storack.update', '') }}/${storack.id}" class="btn btn-warning btn-sm" style="width: 100px;">Edit</a></td>
-                        <td>
-                            <form action="{{ route('storack.destroy', '') }}/${storack.id}" method="POST" onsubmit="return confirm('Are you sure you want to delete this Storacks?');" class="w-100">
-                                @csrf
-                                @method('DELETE')
+    // 事件监听
+    $zoneFilter.on("change", function() {
+        fetchStoracks(1, $(this).val(), $rackFilter.val());
+    });
 
-                                <button type="submit" class="btn btn-danger btn-sm" style="width: 100px;">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                `);
-            });
-        }
+    $rackFilter.on("change", function() {
+        fetchStoracks(1, $zoneFilter.val(), $(this).val());
+    });
 
-        function renderPagination(currentPage, lastPage) {
-            let pagination = $('#pagination');
-            pagination.empty();
+    $pagination.on("click", ".pagination-btn", function(e) {
+        e.preventDefault();
+        fetchStoracks($(this).data("page"), $zoneFilter.val(), $rackFilter.val());
+    });
 
-            // 上一页
-            if (currentPage > 1) {
-                pagination.append(`
-                    <li class="page-item">
-                        <a class="page-link" href="#" data-page="${currentPage - 1}">Previous</a>
-                    </li>
-                `);
-            }
-
-            // 页码
-            for (let i = Math.max(1, currentPage - 2); i <= Math.min(lastPage, currentPage + 2); i++) {
-                pagination.append(`
-                    <li class="page-item ${i === currentPage ? 'active' : ''}">
-                        <a class="page-link" href="#" data-page="${i}">${i}</a>
-                    </li>
-                `);
-            }
-
-            // 下一页
-            if (currentPage < lastPage) {
-                pagination.append(`
-                    <li class="page-item">
-                        <a class="page-link" href="#" data-page="${currentPage + 1}">Next</a>
-                    </li>
-                `);
-            }
-
-            // 分页点击事件
-            $('.page-link').on('click', function(e) {
-                e.preventDefault();
-                const page = $(this).data('page');
-                loadTable(page);
-            });
+    $prevPage.on('click', 'a', function(e) {
+        e.preventDefault();
+        if (!$(this).parent().hasClass('disabled')) {
+            const currentPage = parseInt($('.page-item.active .page-link').data('page'));
+            fetchStoracks(currentPage - 1, $zoneFilter.val(), $rackFilter.val());
         }
     });
+
+    $nextPage.on('click', 'a', function(e) {
+        e.preventDefault();
+        if (!$(this).parent().hasClass('disabled')) {
+            const currentPage = parseInt($('.page-item.active .page-link').data('page'));
+            fetchStoracks(currentPage + 1, $zoneFilter.val(), $rackFilter.val());
+        }
+    });
+
+    // 初始化加载
+    fetchStoracks();
+});
 </script>
 @endsection

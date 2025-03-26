@@ -3,68 +3,248 @@
 @section("title", "Admin Panel")
 @section("content")
 
-<div class="container text-center mt-5">
-    <!-- Success Alert -->
+<link rel="stylesheet" href="{{ asset('assets/css/racks.css') }}">
+<div class="container py-4">
+    <!-- 提示信息 -->
     @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
+        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     @endif
 
-    <!-- Error Alert -->
     @if($errors->any())
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @foreach ($errors->all() as $error)
-            <div>{{ $error }}</div>
-        @endforeach
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
+        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @foreach ($errors->all() as $error)
+                <div>{{ $error }}</div>
+            @endforeach
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     @endif
 
-    <div class="d-flex justify-content-between align-items-center">
-        <h3 class="text-md-start mb-0">Rack List Management</h3>
-
-        <form class="d-flex gap-3 align-items-center" role="search" id="search-form">
-            <select class="form-select" id="rack_id" name="rack_id" style="width: 150px;">
-                <option selected value="">Select a Rack</option>
-                @foreach($racks as $rack)
-                    <option value="{{ $rack->id }}">{{ strtoupper($rack->rack_number) }}</option>
-                @endforeach
-            </select>
-        </form>
-    </div>
-    <hr>
-
-    <div class="row">
-        @foreach($racks as $rack)
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center gap-3">
-                            <img src="{{ asset('assets/icons/Rack.png') }}" alt="Rack Icon" class="img-fluid" style="width: 30px;">
-                            <h4 class="card-title text-primary mb-0">{{ $rack->rack_number }}</h4>
+    <!-- 页面标题和功能区 -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <div class="row justify-content-between align-items-center g-3">
+                <!-- 左侧标题 -->
+                <div class="col-12 col-md-6">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                            <i class="bi bi-box-fill text-primary fs-4"></i>
                         </div>
-                    </div>
-
-                    <div class="card-footer text-body-secondary">
-                        <div class="d-flex justify-content-end gap-2">
-                            <a href="{{ route('rack.update', $rack->id) }}" class="btn btn-warning btn-sm" style="width: 100px;">Edit</a>
-                            <form action="{{ route('rack.destroy', $rack->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this rack?');">
-                                @csrf
-                                @method('DELETE')
-
-                                <button type="submit" class="btn btn-danger btn-sm" style="width: 100px;">Delete</button>
-                            </form>
+                        <div>
+                            <h3 class="mb-0 fw-bold">Rack List Management</h3>
+                            <p class="text-muted mb-0">Manage your racks</p>
                         </div>
                     </div>
                 </div>
+
+                <!-- 右侧功能区 -->
+                <div class="col-12 col-md-6">
+                    <div class="d-flex justify-content-end align-items-center gap-3">
+                        <select class="form-select" id="rack-filter" name="rack_id" style="width: auto; min-width: 200px;">
+                            <option value="">All Racks</option>
+                            @foreach($racks as $rack)
+                                <option value="{{ $rack->id }}">{{ strtoupper($rack->rack_number) }}</option>
+                            @endforeach
+                        </select>
+                        <a href="{{ route('rack.create') }}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle-fill me-2"></i>
+                            Add Rack
+                        </a>
+                    </div>
+                </div>
             </div>
-        @endforeach
+        </div>
+    </div>
+
+    <!-- 机架列表表格 -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table custom-table mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4" style="width: 10%"><div class="table-header">ID</div></th>
+                            <th style="width: 60%"><div class="table-header">RACK NUMBER</div></th>
+                            <th class="text-end pe-4" style="width: 30%"><div class="table-header">ACTIONS</div></th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 分页和结果统计 -->
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <div class="pagination-info text-muted">
+            Showing <span class="fw-medium" id="showing-start">0</span>
+            to <span class="fw-medium" id="showing-end">0</span>
+            of <span class="fw-medium" id="total-count">0</span> entries
+        </div>
+        <nav aria-label="Page navigation">
+            <ul id="pagination" class="pagination pagination-sm mb-0">
+                <li class="page-item disabled" id="prev-page">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+                <!-- 页码由JS动态生成 -->
+                <li class="page-item disabled" id="next-page">
+                    <a class="page-link" href="#" aria-label="Next">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </div>
-@endsection
 
-@section('css')
-    <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+<script>
+$(document).ready(function () {
+    const $tableBody = $("#table-body");
+    const $pagination = $("#pagination");
+    const $rackFilter = $("#rack-filter");
+    const $prevPage = $("#prev-page");
+    const $nextPage = $("#next-page");
+    const $showingStart = $("#showing-start");
+    const $showingEnd = $("#showing-end");
+    const $totalCount = $("#total-count");
+
+    function fetchRacks(page = 1, filter = "") {
+        $.get("{{ route('racks') }}", {
+            page,
+            filter,
+            perPage: 10
+        }, function (response) {
+            if (response.data.length > 0) {
+                renderRacks(response.data);
+                updatePaginationInfo(response);
+            } else {
+                showNoResults();
+            }
+            generatePagination(response);
+            updateRackFilter(response.all_racks);
+        });
+    }
+
+    function renderRacks(racks) {
+        $tableBody.html(racks.map(rack => `
+            <tr>
+                <td class="ps-4"><span class="text-muted">#${rack.id}</span></td>
+                <td><span class="fw-medium">${rack.rack_number.toUpperCase()}</span></td>
+                <td class="text-end pe-4">
+                    <div class="action-buttons">
+                        <a href="{{ route('rack.update', '') }}/${rack.id}" class="btn-action" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <form action="{{ route('rack.destroy', '') }}/${rack.id}" method="POST" style="display: inline-block;" onsubmit="return confirm('Are you sure you want to delete this rack?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn-action delete" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        `).join(""));
+    }
+
+    function updatePaginationInfo(response) {
+        const start = (response.current_page - 1) * response.per_page + 1;
+        const end = Math.min(start + response.per_page - 1, response.total);
+
+        $showingStart.text(response.total > 0 ? start : 0);
+        $showingEnd.text(end);
+        $totalCount.text(response.total);
+    }
+
+    function showNoResults() {
+        $tableBody.empty();
+        $showingStart.text('0');
+        $showingEnd.text('0');
+        $totalCount.text('0');
+    }
+
+    function generatePagination(data) {
+        $("#pagination li:not(#prev-page):not(#next-page)").remove();
+
+        let paginationHTML = '';
+
+        $prevPage.toggleClass('disabled', data.current_page === 1);
+
+        if (data.last_page > 7) {
+            for (let i = 1; i <= data.last_page; i++) {
+                if (i === 1 || i === data.last_page ||
+                    (i >= data.current_page - 1 && i <= data.current_page + 1)) {
+                    paginationHTML += `
+                        <li class="page-item ${i === data.current_page ? 'active' : ''}">
+                            <a class="page-link pagination-btn" href="#" data-page="${i}">${i}</a>
+                        </li>`;
+                } else if (i === data.current_page - 2 || i === data.current_page + 2) {
+                    paginationHTML += `
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>`;
+                }
+            }
+        } else {
+            for (let i = 1; i <= data.last_page; i++) {
+                paginationHTML += `
+                    <li class="page-item ${i === data.current_page ? 'active' : ''}">
+                        <a class="page-link pagination-btn" href="#" data-page="${i}">${i}</a>
+                    </li>`;
+            }
+        }
+
+        $prevPage.after(paginationHTML);
+        $nextPage.toggleClass('disabled', data.current_page === data.last_page);
+    }
+
+    function updateRackFilter(racks) {
+        const currentValue = $rackFilter.val();
+        $rackFilter.html(`
+            <option value="">All Racks</option>
+            ${racks.map(rack => `
+                <option value="${rack.id}" ${rack.id === currentValue ? 'selected' : ''}>
+                    ${rack.rack_number.toUpperCase()}
+                </option>
+            `).join('')}
+        `);
+    }
+
+    // 事件监听
+    $rackFilter.on("change", function() {
+        fetchRacks(1, $(this).val());
+    });
+
+    $pagination.on("click", ".pagination-btn", function(e) {
+        e.preventDefault();
+        fetchRacks($(this).data("page"), $rackFilter.val());
+    });
+
+    $prevPage.on('click', 'a', function(e) {
+        e.preventDefault();
+        if (!$(this).parent().hasClass('disabled')) {
+            const currentPage = parseInt($('.page-item.active .page-link').data('page'));
+            fetchRacks(currentPage - 1, $rackFilter.val());
+        }
+    });
+
+    $nextPage.on('click', 'a', function(e) {
+        e.preventDefault();
+        if (!$(this).parent().hasClass('disabled')) {
+            const currentPage = parseInt($('.page-item.active .page-link').data('page'));
+            fetchRacks(currentPage + 1, $rackFilter.val());
+        }
+    });
+
+    // 初始化加载
+    fetchRacks();
+});
+</script>
 @endsection

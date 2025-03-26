@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('racks', function (Blueprint $table) {
+        Schema::create('brands', function (Blueprint $table) {
             $table->id();
-            $table->string('rack_number', 255)->unique();
-            $table->unsignedInteger('capacity')->default(50);
+            $table->string('brand_image', 255)->default('default.jpg');
+            $table->string('brand_name', 255)->unique();
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('racks');
+        Schema::dropIfExists('brands');
     }
 };

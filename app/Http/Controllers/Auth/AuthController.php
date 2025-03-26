@@ -62,8 +62,8 @@ class AuthController extends Controller
                 'password' => Hash::make($validated['password']),
             ]);
 
-            return redirect()->route('admin.dashboard')
-                           ->with('success', 'Registration successful. Please login.');
+            return redirect()->route('user.list')
+                            ->with('success', 'Staff member has been successfully added.');
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Registration failed. Please try again.']);
         }

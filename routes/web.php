@@ -26,7 +26,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 
 Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function() {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
-    Route::get('/admin/users', [AdminController::class, 'showUserList'])->name('user.list');
+    Route::get('/admin/users', [AdminController::class, 'showUserList'])->name('users');
 
     Route::get('/admin/user-count', function () {
         return response()->json(['count' => \App\Models\User::count()]);
@@ -44,7 +44,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function() {
     Route::delete('/category/destroy/{id}', [CategoryController::class, 'destroy'])->name('category.destroy');
 
     // Add Zone
-    Route::get('/zone/list', [ZoneController::class, 'index'])->name('zone.list');
+    Route::get('/zone/list', [ZoneController::class, 'index'])->name('zones');
     Route::get('/zone/create', [ZoneController::class, 'showCreateForm'])->name('zone.create');
     Route::post('/zone/create', [ZoneController::class, 'create'])->name('zone.create.submit');
     Route::get('/zone/update/{id}', [ZoneController::class, 'showUpdateForm'])->name('zone.update');
@@ -52,7 +52,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function() {
     Route::delete('/zone/delete/{id}', [ZoneController::class, 'destroy'])->name('zone.destroy');
 
     // Add Rack
-    Route::get('/rack/list', [RackController::class, 'index'])->name('rack.list');
+    Route::get('/rack/list', [RackController::class, 'index'])->name('racks');
     Route::get('/rack/create', [RackController::class, 'showCreateForm'])->name('rack.create');
     Route::post('/rack/create', [RackController::class, 'create'])->name('rack.create.submit');
     Route::get('/rack/update/{id}', [RackController::class, 'showUpdateForm'])->name('rack.update');
@@ -60,7 +60,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function() {
     Route::delete('/rack/delete/{id}', [RackController::class, 'destroy'])->name('rack.destroy');
 
     // Add Storack
-    Route::get('/storack/list', [StorackController::class, 'index'])->name('storack.list');
+    Route::get('/storack/list', [StorackController::class, 'index'])->name('storacks');
     Route::get('/storack/create', [StorackController::class, 'showCreateForm'])->name('storack.create');
     Route::post('/storack/create', [StorackController::class, 'create'])->name('storack.create.submit');
     Route::get('/storack/update/{id}', [StorackController::class, 'showUpdateForm'])->name('storack.update');

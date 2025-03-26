@@ -15,7 +15,7 @@
     <div class="container">
         <div class="row g-3">
             <div class="col-sm-12 col-md-6 col-lg-4">
-                <a href="{{ route('user.list') }}" class="text-decoration-none">
+                <a href="{{ route('users') }}" class="text-decoration-none">
                     <div class="card shadow-sm border-0 w-100">
                         <div class="card-header bg-light d-flex flex-column align-items-start p-3" style="border-bottom: 2px solid #007bff;">
                             <h5 class="card-title mb-1" style="font-weight: bold; color: #333; font-size: 1.2rem;">
