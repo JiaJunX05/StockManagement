@@ -75,7 +75,7 @@
                         <tr>
                             <th class="ps-4" style="width: 10%"><div class="table-header">ID</div></th>
                             <th style="width: 15%"><div class="table-header">ZONE IMAGE</div></th>
-                            <th style="width: 25%"><div class="table-header">STORAGE INFO</div></th>
+                            <th style="width: 15%"><div class="table-header">STORAGE INFO</div></th>
                             <th style="width: 50%"><div class="table-header">ZONE LOCATION</div></th>
                             <th class="text-end pe-4" style="width: 10%"><div class="table-header">Actions</div></th>
                         </tr>
