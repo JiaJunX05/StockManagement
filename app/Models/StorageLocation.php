@@ -10,11 +10,11 @@ use App\Models\Zone;
 use App\Models\Rack;
 use App\Models\SKU;
 
-class Storack extends Model
+class StorageLocation extends Model
 {
     use HasFactory;
 
-    protected $table = 'storacks';
+    protected $table = 'storage_locations';
 
     protected $fillable = [
         'zone_id',

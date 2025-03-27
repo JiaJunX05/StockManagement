@@ -89,7 +89,7 @@
 
                 <!-- 返回链接 -->
                 <div class="text-center">
-                    <a href="{{ route('user.list') }}" class="back-link">
+                    <a href="{{ route('users') }}" class="back-link">
                         <i class="bi bi-arrow-left"></i>
                         Back to Dashboard
                     </a>

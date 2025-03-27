@@ -3,7 +3,7 @@
 @section("title", "Admin Panel")
 @section("content")
 
-<link rel="stylesheet" href="{{ asset('assets/css/racks.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/locations.css') }}">
 <div class="container py-4">
     <!-- 提示信息 -->
     @if(session('success'))
@@ -32,11 +32,11 @@
                 <div class="col-12 col-md-6">
                     <div class="d-flex align-items-center">
                         <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
-                            <i class="bi bi-box-fill text-primary fs-4"></i>
+                            <i class="bi bi-geo-alt-fill text-primary fs-4"></i>
                         </div>
                         <div>
-                            <h3 class="mb-0 fw-bold">Rack List Management</h3>
-                            <p class="text-muted mb-0">Manage your racks</p>
+                            <h3 class="mb-0 fw-bold">Location List Management</h3>
+                            <p class="text-muted mb-0">Manage your locations</p>
                         </div>
                     </div>
                 </div>
@@ -44,15 +44,21 @@
                 <!-- 右侧功能区 -->
                 <div class="col-12 col-md-6">
                     <div class="d-flex justify-content-end align-items-center gap-3">
+                        <select class="form-select" id="zone-filter" name="zone_id" style="width: auto; min-width: 200px;">
+                            <option value="">All Zones</option>
+                            @foreach($zones as $zone)
+                                <option value="{{ $zone->id }}">{{ strtoupper($zone->zone_name) }}</option>
+                            @endforeach
+                        </select>
                         <select class="form-select" id="rack-filter" name="rack_id" style="width: auto; min-width: 200px;">
                             <option value="">All Racks</option>
                             @foreach($racks as $rack)
                                 <option value="{{ $rack->id }}">{{ strtoupper($rack->rack_number) }}</option>
                             @endforeach
                         </select>
-                        <a href="{{ route('rack.create') }}" class="btn btn-primary">
+                        <a href="{{ route('location.create') }}" class="btn btn-primary">
                             <i class="bi bi-plus-circle-fill me-2"></i>
-                            Add Rack
+                            Add Location
                         </a>
                     </div>
                 </div>
@@ -60,7 +66,7 @@
         </div>
     </div>
 
-    <!-- 机架列表表格 -->
+    <!-- 列表表格 -->
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -68,8 +74,10 @@
                     <thead>
                         <tr>
                             <th class="ps-4" style="width: 10%"><div class="table-header">ID</div></th>
-                            <th style="width: 60%"><div class="table-header">RACK NUMBER</div></th>
-                            <th class="text-end pe-4" style="width: 30%"><div class="table-header">ACTIONS</div></th>
+                            <th style="width: 15%"><div class="table-header">ZONE IMAGE</div></th>
+                            <th style="width: 25%"><div class="table-header">STORAGE INFO</div></th>
+                            <th style="width: 50%"><div class="table-header">ZONE LOCATION</div></th>
+                            <th class="text-end pe-4" style="width: 10%"><div class="table-header">Actions</div></th>
                         </tr>
                     </thead>
                     <tbody id="table-body"></tbody>
@@ -92,7 +100,6 @@
                         <i class="bi bi-chevron-left"></i>
                     </a>
                 </li>
-                <!-- 页码由JS动态生成 -->
                 <li class="page-item disabled" id="next-page">
                     <a class="page-link" href="#" aria-label="Next">
                         <i class="bi bi-chevron-right"></i>
@@ -103,10 +110,30 @@
     </div>
 </div>
 
+<!-- 图片预览 Modal -->
+<div class="modal fade" id="imagePreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center p-0">
+                <img id="previewImage" src="" alt="Preview" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+function previewImage(src) {
+    document.getElementById('previewImage').src = src;
+    new bootstrap.Modal(document.getElementById('imagePreviewModal')).show();
+}
+
 $(document).ready(function () {
     const $tableBody = $("#table-body");
     const $pagination = $("#pagination");
+    const $zoneFilter = $("#zone-filter");
     const $rackFilter = $("#rack-filter");
     const $prevPage = $("#prev-page");
     const $nextPage = $("#next-page");
@@ -114,34 +141,54 @@ $(document).ready(function () {
     const $showingEnd = $("#showing-end");
     const $totalCount = $("#total-count");
 
-    function fetchRacks(page = 1, filter = "") {
-        $.get("{{ route('racks') }}", {
+    function fetchLocations(page = 1, zone = "", rack = "") {
+        $.get("{{ route('location.index') }}", {
             page,
-            filter,
+            zone_id: zone,
+            rack_id: rack,
             perPage: 10
         }, function (response) {
             if (response.data.length > 0) {
-                renderRacks(response.data);
+                renderLocations(response.data);
                 updatePaginationInfo(response);
             } else {
                 showNoResults();
             }
             generatePagination(response);
-            updateRackFilter(response.all_racks);
         });
     }
 
-    function renderRacks(racks) {
-        $tableBody.html(racks.map(rack => `
+    function renderLocations(locations) {
+        $tableBody.html(locations.map(location => `
             <tr>
-                <td class="ps-4"><span class="text-muted">#${rack.id}</span></td>
-                <td><span class="fw-medium">${rack.rack_number.toUpperCase()}</span></td>
+                <td class="ps-4"><span class="text-muted">#${location.id}</span></td>
+                <td>
+                    ${location.zone && location.zone.zone_image ? `
+                        <img src="/assets/${location.zone.zone_image}" alt="Zone Image"
+                            class="img-fluid w-50 h-50 object-fit-cover preview-image cursor-pointer"
+                            onclick="previewImage('/assets/${location.zone.zone_image}')">
+                    ` : 'N/A'}
+                </td>
+                <td>
+                    <div class="storage-info">
+                        <div class="zone-info mb-1">
+                            <span class="fw-medium">${location.zone ? location.zone.zone_name.toUpperCase() : 'N/A'}</span>
+                        </div>
+                        <div class="rack-info d-flex align-items-center">
+                            <span class="fw-medium me-2">${location.rack ? location.rack.rack_number.toUpperCase() : 'N/A'}</span>
+                            <span class="text-muted">(Capacity: ${location.rack ? location.rack.capacity : 'N/A'})</span>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="fw-medium">${location.zone ? location.zone.location.toUpperCase() : 'N/A'}</span></td>
                 <td class="text-end pe-4">
                     <div class="action-buttons">
-                        <a href="{{ route('rack.update', '') }}/${rack.id}" class="btn-action" title="Edit">
+                        <a href="{{ route('location.edit', '') }}/${location.id}" class="btn-action" title="Edit">
                             <i class="bi bi-pencil"></i>
                         </a>
-                        <form action="{{ route('rack.destroy', '') }}/${rack.id}" method="POST" style="display: inline-block;" onsubmit="return confirm('Are you sure you want to delete this rack?');">
+                        <form action="{{ route('location.destroy', '') }}/${location.id}" method="POST"
+                            style="display: inline-block;"
+                            onsubmit="return confirm('Are you sure you want to delete this location?');">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn-action delete" title="Delete">
@@ -205,33 +252,25 @@ $(document).ready(function () {
         $nextPage.toggleClass('disabled', data.current_page === data.last_page);
     }
 
-    function updateRackFilter(racks) {
-        const currentValue = $rackFilter.val();
-        $rackFilter.html(`
-            <option value="">All Racks</option>
-            ${racks.map(rack => `
-                <option value="${rack.id}" ${rack.id === currentValue ? 'selected' : ''}>
-                    ${rack.rack_number.toUpperCase()}
-                </option>
-            `).join('')}
-        `);
-    }
-
     // 事件监听
+    $zoneFilter.on("change", function() {
+        fetchLocations(1, $(this).val(), $rackFilter.val());
+    });
+
     $rackFilter.on("change", function() {
-        fetchRacks(1, $(this).val());
+        fetchLocations(1, $zoneFilter.val(), $(this).val());
     });
 
     $pagination.on("click", ".pagination-btn", function(e) {
         e.preventDefault();
-        fetchRacks($(this).data("page"), $rackFilter.val());
+        fetchLocations($(this).data("page"), $zoneFilter.val(), $rackFilter.val());
     });
 
     $prevPage.on('click', 'a', function(e) {
         e.preventDefault();
         if (!$(this).parent().hasClass('disabled')) {
             const currentPage = parseInt($('.page-item.active .page-link').data('page'));
-            fetchRacks(currentPage - 1, $rackFilter.val());
+            fetchLocations(currentPage - 1, $zoneFilter.val(), $rackFilter.val());
         }
     });
 
@@ -239,12 +278,12 @@ $(document).ready(function () {
         e.preventDefault();
         if (!$(this).parent().hasClass('disabled')) {
             const currentPage = parseInt($('.page-item.active .page-link').data('page'));
-            fetchRacks(currentPage + 1, $rackFilter.val());
+            fetchLocations(currentPage + 1, $zoneFilter.val(), $rackFilter.val());
         }
     });
 
     // 初始化加载
-    fetchRacks();
+    fetchLocations();
 });
 </script>
 @endsection

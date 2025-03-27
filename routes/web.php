@@ -4,13 +4,17 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 // use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\ZoneController;
-use App\Http\Controllers\Admin\RackController;
-use App\Http\Controllers\Admin\StorackController;
-use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\StorageLocation\ZoneController;
+use App\Http\Controllers\Admin\StorageLocation\RackController;
+use App\Http\Controllers\Admin\StorageLocation\LocationController;
+use App\Http\Controllers\Admin\CategoryMapping\CategoryController;
+use App\Http\Controllers\Admin\CategoryMapping\SubCategoryController;
+use App\Http\Controllers\Admin\CategoryMapping\MappingController;
+// use App\Http\Controllers\Admin\CategoryController;
+// use App\Http\Controllers\Admin\StorackController;
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\StaffController;
-use App\Http\Controllers\ProductController;
+// use App\Http\Controllers\ProductController;
 
 // Guest routes
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
@@ -35,48 +39,54 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function() {
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
 
+    // Create Zone
+    Route::get('/zone/index', [ZoneController::class, 'index'])->name('zone.index');
+    Route::get('/zone/create', [ZoneController::class, 'create'])->name('zone.create');
+    Route::post('/zone/store', [ZoneController::class, 'store'])->name('zone.store');
+    Route::get('/zone/edit/{id}', [ZoneController::class, 'edit'])->name('zone.edit');
+    Route::put('/zone/update/{id}', [ZoneController::class, 'update'])->name('zone.update');
+    Route::delete('/zone/destroy/{id}', [ZoneController::class, 'destroy'])->name('zone.destroy');
+
+    // Create Rack
+    Route::get('/rack/index', [RackController::class, 'index'])->name('rack.index');
+    Route::get('/rack/create', [RackController::class, 'create'])->name('rack.create');
+    Route::post('/rack/store', [RackController::class, 'store'])->name('rack.store');
+    Route::get('/rack/edit/{id}', [RackController::class, 'edit'])->name('rack.edit');
+    Route::put('/rack/update/{id}', [RackController::class, 'update'])->name('rack.update');
+    Route::delete('/rack/destroy/{id}', [RackController::class, 'destroy'])->name('rack.destroy');
+
+    // Create Storage Location
+    Route::get('/location/index', [LocationController::class, 'index'])->name('location.index');
+    Route::get('/location/create', [LocationController::class, 'create'])->name('location.create');
+    Route::post('/location/store', [LocationController::class, 'store'])->name('location.store');
+    Route::get('/location/edit/{id}', [LocationController::class, 'edit'])->name('location.edit');
+    Route::put('/location/update/{id}', [LocationController::class, 'update'])->name('location.update');
+    Route::delete('/location/destroy/{id}', [LocationController::class, 'destroy'])->name('location.destroy');
+
+
     // Add Category
     Route::get('/category/list', [CategoryController::class, 'index'])->name('category.list');
-    Route::get('/category/create', [CategoryController::class, 'showCreateForm'])->name('category.create');
-    Route::post('/category/create', [CategoryController::class, 'create'])->name('category.create.submit');
-    Route::get('/category/update/{id}', [CategoryController::class, 'showUpdateForm'])->name('category.update');
-    Route::put('/category/update/{id}', [CategoryController::class, 'update'])->name('category.update.submit');
+    Route::get('/category/create', [CategoryController::class, 'create'])->name('category.create');
+    Route::post('/category/store', [CategoryController::class, 'store'])->name('category.store');
+    Route::get('/category/edit/{id}', [CategoryController::class, 'edit'])->name('category.edit');
+    Route::put('/category/update/{id}', [CategoryController::class, 'update'])->name('category.update');
     Route::delete('/category/destroy/{id}', [CategoryController::class, 'destroy'])->name('category.destroy');
 
-    // Add Zone
-    Route::get('/zone/list', [ZoneController::class, 'index'])->name('zones');
-    Route::get('/zone/create', [ZoneController::class, 'showCreateForm'])->name('zone.create');
-    Route::post('/zone/create', [ZoneController::class, 'create'])->name('zone.create.submit');
-    Route::get('/zone/update/{id}', [ZoneController::class, 'showUpdateForm'])->name('zone.update');
-    Route::put('/zone/update/{id}', [ZoneController::class, 'update'])->name('zone.update.submit');
-    Route::delete('/zone/delete/{id}', [ZoneController::class, 'destroy'])->name('zone.destroy');
 
-    // Add Rack
-    Route::get('/rack/list', [RackController::class, 'index'])->name('racks');
-    Route::get('/rack/create', [RackController::class, 'showCreateForm'])->name('rack.create');
-    Route::post('/rack/create', [RackController::class, 'create'])->name('rack.create.submit');
-    Route::get('/rack/update/{id}', [RackController::class, 'showUpdateForm'])->name('rack.update');
-    Route::put('/rack/update/{id}', [RackController::class, 'update'])->name('rack.update.submit');
-    Route::delete('/rack/delete/{id}', [RackController::class, 'destroy'])->name('rack.destroy');
 
-    // Add Storack
-    Route::get('/storack/list', [StorackController::class, 'index'])->name('storacks');
-    Route::get('/storack/create', [StorackController::class, 'showCreateForm'])->name('storack.create');
-    Route::post('/storack/create', [StorackController::class, 'create'])->name('storack.create.submit');
-    Route::get('/storack/update/{id}', [StorackController::class, 'showUpdateForm'])->name('storack.update');
-    Route::put('/storack/update/{id}', [StorackController::class, 'update'])->name('storack.update.submit');
-    Route::delete('/storack/delete/{id}', [StorackController::class, 'destroy'])->name('storack.destroy');
+
+
 
     // Add Product
-    Route::get('/product/list', [AdminProductController::class, 'index'])->name('product.list');
-    Route::get('/product/create', [AdminProductController::class, 'showCreateForm'])->name('product.create');
-    Route::post('/product/create', [AdminProductController::class, 'create'])->name('product.create.submit');
-    Route::get('.product/view/{id}', [AdminProductController::class, 'view'])->name('product.view');
-    Route::get('/product/stock/{id}', [AdminProductController::class, 'showStockForm'])->name('product.stock');
-    Route::put('/product/stock/{id}', [AdminProductController::class, 'stockUpdate'])->name('product.stock.submit');
-    Route::get('/product/update/{id}', [AdminProductController::class, 'showUpdateForm'])->name('product.update');
-    Route::put('/product/update/{id}', [AdminProductController::class, 'update'])->name('product.update.submit');
-    Route::delete('/product/delete/{id}', [AdminProductController::class, 'destroy'])->name('product.destroy');
+    Route::get('/product/list', [ProductController::class, 'index'])->name('product.list');
+    Route::get('/product/create', [ProductController::class, 'showCreateForm'])->name('product.create');
+    Route::post('/product/create', [ProductController::class, 'create'])->name('product.create.submit');
+    Route::get('.product/view/{id}', [ProductController::class, 'view'])->name('product.view');
+    Route::get('/product/stock/{id}', [ProductController::class, 'showStockForm'])->name('product.stock');
+    Route::put('/product/stock/{id}', [ProductController::class, 'stockUpdate'])->name('product.stock.submit');
+    Route::get('/product/update/{id}', [ProductController::class, 'showUpdateForm'])->name('product.update');
+    Route::put('/product/update/{id}', [ProductController::class, 'update'])->name('product.update.submit');
+    Route::delete('/product/delete/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
 });
 
 Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function() {

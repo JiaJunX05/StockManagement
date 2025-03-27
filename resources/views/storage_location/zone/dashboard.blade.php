@@ -68,8 +68,10 @@
                     <thead>
                         <tr>
                             <th class="ps-4" style="width: 10%"><div class="table-header">ID</div></th>
-                            <th style="width: 60%"><div class="table-header">ZONE NAME</div></th>
-                            <th class="text-end pe-4" style="width: 30%"><div class="table-header">ACTIONS</div></th>
+                            <th style="width: 15%"><div class="table-header">ZONE IMAGE</div></th>
+                            <th style="width: 15%"><div class="table-header">ZONE NAME</div></th>
+                            <th style="width: 50%"><div class="table-header">ZONE LOCATION</div></th>
+                            <th class="text-end pe-4" style="width: 10%"><div class="table-header">ACTIONS</div></th>
                         </tr>
                     </thead>
                     <tbody id="table-body"></tbody>
@@ -103,7 +105,26 @@
     </div>
 </div>
 
+<!-- 图片预览 Modal -->
+<div class="modal fade" id="imagePreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center p-0">
+                <img id="previewImage" src="" alt="Preview" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+function previewImage(src) {
+    document.getElementById('previewImage').src = src;
+    new bootstrap.Modal(document.getElementById('imagePreviewModal')).show();
+}
+
 $(document).ready(function () {
     const $tableBody = $("#table-body");
     const $pagination = $("#pagination");
@@ -116,7 +137,7 @@ $(document).ready(function () {
     const $totalCount = $("#total-count");
 
     function fetchZones(page = 1, search = "", filter = "") {
-        $.get("{{ route('zones') }}", {
+        $.get("{{ route('zone.index') }}", {
             page,
             search,
             filter,
@@ -137,10 +158,16 @@ $(document).ready(function () {
         $tableBody.html(zones.map(zone => `
             <tr>
                 <td class="ps-4"><span class="text-muted">#${zone.id}</span></td>
+                <td>
+                    <img src="/assets/${zone.zone_image}" alt="Zone Image"
+                         class="img-fluid w-50 h-50 object-fit-cover preview-image  cursor-pointer"
+                         onclick="previewImage('/assets/${zone.zone_image}')">
+                </td>
                 <td><span class="fw-medium">${zone.zone_name.toUpperCase()}</span></td>
+                <td><span class="fw-medium">${zone.location.toUpperCase()}</span></td>
                 <td class="text-end pe-4">
                     <div class="action-buttons">
-                        <a href="{{ route('zone.update', '') }}/${zone.id}" class="btn-action" title="Edit">
+                        <a href="{{ route('zone.edit', '') }}/${zone.id}" class="btn-action" title="Edit">
                             <i class="bi bi-pencil"></i>
                         </a>
                         <form action="{{ route('zone.destroy', '') }}/${zone.id}" method="POST" style="display: inline-block;" onsubmit="return confirm('Are you sure you want to delete this zone?');">

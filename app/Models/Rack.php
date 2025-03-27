@@ -24,8 +24,8 @@ class Rack extends Model
         return $this->hasManyThrough(Zone::class, Storack::class, 'rack_id','zone_id');
     }
 
-    public function storacks(): HasMany {
-        return $this->hasMany(Storack::class, 'rack_id');
+    public function storageLocations(): HasMany {
+        return $this->hasMany(StorageLocation::class, 'rack_id');
     }
 
     public function skus(): HasMany {

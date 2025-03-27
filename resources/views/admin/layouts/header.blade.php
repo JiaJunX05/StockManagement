@@ -25,92 +25,55 @@
                     </a>
                 </li>
 
-                <!-- Storage -->
+                <!-- Zone & Rack Management -->
                 <li class="nav-item dropdown menu-item">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-grid-fill menu-icon me-2"></i><span>Storage</span>
+                        <i class="bi bi-hdd menu-icon me-2"></i><span>Storage Location</span>
                     </a>
                     <ul class="dropdown-menu custom-dropdown">
                         <li>
-                            <a class="dropdown-item" href="{{ route('zones') }}">
-                                <i class="bi bi-map-fill me-2"></i> </i><span>Zones</span>
+                            <a class="dropdown-item" href="{{ route('zone.index') }}">
+                                <i class="bi bi-map me-2"></i><span>Manage Zone</span>
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="{{ route('racks') }}">
-                                <i class="bi bi-columns-gap me-2"></i></i><span>Racks</span>
+                            <a class="dropdown-item" href="{{ route('rack.index') }}">
+                                <i class="bi bi-bar-chart-steps me-2"></i><span>Manage Rack</span>
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
-                            <a class="dropdown-item" href="{{ route('storacks') }}">
-                                <i class="bi bi-layout-wtf me-2"></i></i><span>Storacks</span>
+                            <a class="dropdown-item" href="{{ route('location.index') }}">
+                                <i class="bi bi-bezier2 me-2"></i><span>Storage Location</span>
                             </a>
                         </li>
                     </ul>
                 </li>
 
-                <!-- Category -->
+                <!-- Category & Subcategory Management -->
                 <li class="nav-item dropdown menu-item">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-tags-fill menu-icon me-2"></i><span>Category</span>
+                        <i class="bi bi-diagram-3 menu-icon me-2"></i><span>Categories</span>
                     </a>
                     <ul class="dropdown-menu custom-dropdown">
                         <li>
                             <a class="dropdown-item" href="{{ route('category.create') }}">
-                                <i class="bi bi-plus-square-fill me-2"></i><span>Add Category</span>
+                                <i class="bi bi-folder-plus me-2"></i><span>Create Category</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('category.create') }}">
+                                <i class="bi bi-folder-symlink me-2"></i><span>Create Subcategory</span>
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <a class="dropdown-item" href="{{ route('category.list') }}">
-                                <i class="bi bi-list-ul me-2"></i><span>Category List</span>
+                                <i class="bi bi-folder-fill me-2"></i><span>View Categories</span>
                             </a>
                         </li>
                     </ul>
                 </li>
-
-
-
-                {{-- <!-- Rack -->
-                <li class="nav-item dropdown menu-item">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-box-seam menu-icon me-2"></i><span>Rack</span>
-                    </a>
-                    <ul class="dropdown-menu custom-dropdown">
-                        <li>
-                            <a class="dropdown-item" href="{{ route('rack.create') }}">
-                                <i class="bi bi-plus-square-fill me-2"></i><span>Add Rack</span>
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="{{ route('rack.list') }}">
-                                <i class="bi bi-list-ul me-2"></i><span>Rack List</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <!-- Storack -->
-                <li class="nav-item dropdown menu-item">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-archive-fill menu-icon me-2"></i><span>Storack</span>
-                    </a>
-                    <ul class="dropdown-menu custom-dropdown">
-                        <li>
-                            <a class="dropdown-item" href="{{ route('storack.create') }}">
-                                <i class="bi bi-plus-square-fill me-2"></i><span>Add Storack</span>
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="{{ route('storack.list') }}">
-                                <i class="bi bi-list-ul me-2"></i><span>Storack List</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li> --}}
 
                 <!-- Product -->
                 <li class="nav-item dropdown menu-item">
