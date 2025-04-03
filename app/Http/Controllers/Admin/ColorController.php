@@ -16,7 +16,9 @@ class ColorController extends Controller
 
                 // 颜色名称筛选
                 $query->when($request->filled('search'), function ($query) use ($request) {
-                    $query->where('color_name', 'like', '%' . $request->search . '%');
+                    $query->where('color_name', 'like', '%' . $request->search . '%')
+                        ->orWhere('hex_code', 'like', '%' . $request->search . '%')
+                        ->orWhere('rgb_code', 'like', '%' . $request->search . '%');
                 })
                 // 颜色筛选
                 ->when($request->filled('color_id'), function ($query) use ($request) {
@@ -53,10 +55,10 @@ class ColorController extends Controller
             }
 
             $colors = Color::all();
-            return view('admin.color.index', compact('colors'));
+            return view('color.dashboard', compact('colors'));
 
         } catch (\Exception $e) {
-            \Log::error('Color index error: ' . $e->getMessage());
+            \Log::error('Failed to load colors: ' . $e->getMessage());
             if ($request->ajax()) {
                 return response()->json(['error' => 'Failed to load colors'], 500);
             }
@@ -74,12 +76,14 @@ class ColorController extends Controller
         try {
             $request->validate([
                 'color_name' => 'required|string|max:255|unique:colors',
-                'hex_code' => 'required|string|max:255',
+                'hex_code' => ['required', 'string', 'max:7', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+                'rgb_code' => 'required|string|max:255|unique:colors',
             ]);
 
             $color = Color::create([
                 'color_name' => $request->color_name,
                 'hex_code' => $request->hex_code,
+                'rgb_code' => $request->rgb_code,
             ]);
 
             return redirect()->route('color.index')
@@ -101,7 +105,8 @@ class ColorController extends Controller
         try {
             $request->validate([
                 'color_name' => 'required|string|max:255|unique:colors,color_name,' . $id,
-                'hex_code' => 'required|string|max:255',
+                'hex_code' => ['required', 'string', 'max:7', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+                'rgb_code' => 'required|string|max:255|unique:colors,rgb_code,' . $id,
             ]);
 
             $color = Color::findOrFail($id);
@@ -113,6 +118,7 @@ class ColorController extends Controller
 
             $color->color_name = $request->color_name;
             $color->hex_code = $request->hex_code;
+            $color->rgb_code = $request->rgb_code;
             $color->save();
 
             return redirect()->route('color.index')

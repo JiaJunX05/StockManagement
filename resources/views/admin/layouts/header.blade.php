@@ -88,7 +88,7 @@
                         </li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
-                            <a class="dropdown-item" href="">
+                            <a class="dropdown-item" href="{{ route('color.index') }}">
                                 <i class="bi bi-palette-fill me-2"></i><span>Manage Color</span>
                             </a>
                         </li>

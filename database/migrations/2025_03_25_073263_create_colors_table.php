@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('color_name', 255)->unique();
             $table->string('hex_code', 7)->unique();
+            $table->string('rgb_code', 255)->unique();
             $table->timestamps();
         });
     }
