@@ -26,29 +26,29 @@ class RackController extends Controller
                 $perPage = $request->input('perPage', 10);
                 $page = $request->input('page', 1);
 
-            $racks = $query->paginate($perPage, ['*'], 'page', $page);
+                $racks = $query->paginate($perPage, ['*'], 'page', $page);
 
-            // 计算分页显示信息
-            $total = $racks->total();
-            $start = $total > 0 ? ($racks->currentPage() - 1) * $perPage + 1 : 0;
-            $end = min($start + $perPage - 1, $total);
+                // 计算分页显示信息
+                $total = $racks->total();
+                $start = $total > 0 ? ($racks->currentPage() - 1) * $perPage + 1 : 0;
+                $end = min($start + $perPage - 1, $total);
 
-            return response()->json([
-                'data' => $racks->items(),
-                'current_page' => $racks->currentPage(),
-                'last_page' => $racks->lastPage(),
-                'total' => $total,
-                'per_page' => $perPage,
-                'from' => $start,
-                'to' => $end,
-                'pagination' => [
-                    'showing_start' => $start,
-                    'showing_end' => $end,
-                    'total_count' => $total,
-                    'has_more_pages' => $racks->hasMorePages(),
-                    'is_first_page' => $racks->onFirstPage(),
-                    'is_last_page' => $racks->currentPage() === $racks->lastPage()
-                ],
+                return response()->json([
+                    'data' => $racks->items(),
+                    'current_page' => $racks->currentPage(),
+                    'last_page' => $racks->lastPage(),
+                    'total' => $total,
+                    'per_page' => $perPage,
+                    'from' => $start,
+                    'to' => $end,
+                    'pagination' => [
+                        'showing_start' => $start,
+                        'showing_end' => $end,
+                        'total_count' => $total,
+                        'has_more_pages' => $racks->hasMorePages(),
+                        'is_first_page' => $racks->onFirstPage(),
+                        'is_last_page' => $racks->currentPage() === $racks->lastPage()
+                    ],
                 ]);
             }
 
@@ -62,7 +62,7 @@ class RackController extends Controller
             }
 
             return redirect()->back()
-                            ->with('error', 'Failed to load racks');
+                            ->withErrors(['error' => 'Failed to load racks']);
         }
     }
 
