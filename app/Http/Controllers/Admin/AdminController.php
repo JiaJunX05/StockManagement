@@ -9,13 +9,13 @@ use App\Models\Product;
 
 class AdminController extends Controller
 {
-    public function index() {
-        $totalCount = User::count();
-        $adminCount = User::where('role', 'admin')->count();
-        $staffCount = User::where('role', 'staff')->count();
+    // public function index() {
+    //     $totalCount = User::count();
+    //     $adminCount = User::where('role', 'admin')->count();
+    //     $staffCount = User::where('role', 'staff')->count();
 
-        return view('admin.dashboard', compact('totalCount', 'adminCount', 'staffCount'));
-    }
+    //     return view('admin.dashboard', compact('totalCount', 'adminCount', 'staffCount'));
+    // }
 
     public function showUserList(Request $request) {
         if ($request->ajax()) {

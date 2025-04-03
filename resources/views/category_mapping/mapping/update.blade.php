@@ -1,6 +1,6 @@
 @extends("admin.layouts.app")
 
-@section("title", "Update Rack")
+@section("title", "Update Mapping")
 @section("content")
 
 <style>
@@ -44,14 +44,14 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
                     <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
-                        <i class="bi bi-pencil-square text-primary fs-4"></i>
+                        <i class="bi bi-diagram-2 text-primary fs-4"></i>
                     </div>
                     <div>
-                        <h4 class="mb-0 fw-bold">Update Rack</h4>
-                        <p class="text-muted mb-0">Modify an existing rack to better organize and manage stock storage efficiently</p>
+                        <h4 class="mb-0 fw-bold">Update Category Mapping</h4>
+                        <p class="text-muted mb-0">Modify the relationship between categories and subcategories</p>
                     </div>
                 </div>
-                <a href="{{ route('rack.index') }}" class="btn btn-primary">
+                <a href="{{ route('mapping.index') }}" class="btn btn-primary">
                     <i class="bi bi-arrow-left me-2"></i>Back to List
                 </a>
             </div>
@@ -66,13 +66,13 @@
                 <div class="preview-section d-flex flex-column h-100 bg-light p-3">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h6 class="mb-0 fw-bold text-primary">
-                            <i class="bi bi-box-seam me-2"></i>Rack Information
+                            <i class="bi bi-diagram-2 me-2"></i>Mapping Information
                         </h6>
                     </div>
                     <div class="preview-container flex-grow-1 d-flex align-items-center justify-content-center">
                         <div class="text-center">
-                            <i class="bi bi-box-seam text-primary" style="font-size: 8rem;"></i>
-                            <p class="text-muted mt-3">Storage Rack Management</p>
+                            <i class="bi bi-diagram-2 text-primary" style="font-size: 8rem;"></i>
+                            <p class="text-muted mt-3">Category Mapping Management</p>
                         </div>
                     </div>
                 </div>
@@ -82,38 +82,52 @@
             <div class="col-md-7">
                 <div class="card-body p-4">
                     <!-- 表单标题 -->
-                    <h2 class="text-primary text-center mb-3">Update Rack</h2>
-                    <p class="text-muted text-center">Modify an existing rack to better organize and manage stock storage efficiently</p>
+                    <h2 class="text-primary text-center mb-3">Update Category Mapping</h2>
+                    <p class="text-muted text-center">Modify the relationship between categories and subcategories</p>
                     <hr>
 
                     <!-- 表单内容 -->
-                    <form action="{{ route('rack.update', $rack->id) }}" method="post">
+                    <form action="{{ route('mapping.update', $mapping->id) }}" method="post">
                         @csrf
                         @method('PUT')
 
                         <div class="mb-4">
-                            <label for="rack_number" class="form-label fw-bold">Rack Number</label>
+                            <label for="category_id" class="form-label fw-bold">Category</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-hash text-primary"></i></span>
-                                <input type="text" class="form-control border-start-0" id="rack_number" name="rack_number" value="{{ $rack->rack_number }}" required>
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="bi bi-folder text-primary"></i>
+                                </span>
+                                <select class="form-select border-start-0" id="category_id" name="category_id" required>
+                                    <option disabled value="">Select a category</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" {{ $mapping->category_id == $category->id ? 'selected' : '' }}>
+                                            {{ strtoupper($category->category_name) }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
 
                         <div class="mb-4">
-                            <label for="capacity" class="form-label fw-bold">Rack Capacity</label>
+                            <label for="subcategory_id" class="form-label fw-bold">Subcategory</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-boxes text-primary"></i></span>
-                                <input type="number" class="form-control border-start-0" id="capacity" name="capacity" value="{{ $rack->capacity }}" placeholder="Enter rack capacity (default: 50)">
-                            </div>
-                            <div class="form-text">
-                                <i class="bi bi-info-circle me-2"></i>
-                                Leave empty to use default capacity (50)
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="bi bi-folder2 text-primary"></i>
+                                </span>
+                                <select class="form-select border-start-0" id="subcategory_id" name="subcategory_id" required>
+                                    <option disabled value="">Select a subcategory</option>
+                                    @foreach($subcategories as $subcategory)
+                                        <option value="{{ $subcategory->id }}" {{ $mapping->subcategory_id == $subcategory->id ? 'selected' : '' }}>
+                                            {{ strtoupper($subcategory->subcategory_name) }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
 
                         <hr class="my-4">
                         <button type="submit" class="btn btn-primary w-100">
-                            <i class="bi bi-check-circle-fill me-2"></i>Update Rack
+                            <i class="bi bi-check-circle-fill me-2"></i>Update Mapping
                         </button>
                     </form>
                 </div>

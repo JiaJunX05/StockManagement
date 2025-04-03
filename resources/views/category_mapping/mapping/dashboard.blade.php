@@ -1,9 +1,9 @@
 @extends("admin.layouts.app")
 
-@section("title", "Location Management")
+@section("title", "Category Mapping Management")
 @section("content")
 
-<link rel="stylesheet" href="{{ asset('assets/css/storage/location.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/category/mapping.css') }}">
 <div class="container py-4">
     <!-- 提示信息 -->
     @if(session('success'))
@@ -32,11 +32,11 @@
                 <div class="col-12 col-md-6">
                     <div class="d-flex align-items-center">
                         <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
-                            <i class="bi bi-geo-alt-fill text-primary fs-4"></i>
+                            <i class="bi bi-diagram-2-fill text-primary fs-4"></i>
                         </div>
                         <div>
-                            <h3 class="mb-0 fw-bold">Storage Location Management</h3>
-                            <p class="text-muted mb-0">Manage your storage locations</p>
+                            <h3 class="mb-0 fw-bold">Category Mapping Management</h3>
+                            <p class="text-muted mb-0">Manage category and subcategory relationships</p>
                         </div>
                     </div>
                 </div>
@@ -44,21 +44,21 @@
                 <!-- 右侧功能区 -->
                 <div class="col-12 col-md-6">
                     <div class="d-flex justify-content-end align-items-center gap-3">
-                        <select class="form-select" id="zone-filter" name="zone_id" style="width: auto; min-width: 200px;">
-                            <option value="">All Zones</option>
-                            @foreach($zones as $zone)
-                                <option value="{{ $zone->id }}">{{ strtoupper($zone->zone_name) }}</option>
+                        <select class="form-select" id="category-filter" name="category_id" style="width: auto; min-width: 200px;">
+                            <option value="">All Categories</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}">{{ strtoupper($category->category_name) }}</option>
                             @endforeach
                         </select>
-                        <select class="form-select" id="rack-filter" name="rack_id" style="width: auto; min-width: 200px;">
-                            <option value="">All Racks</option>
-                            @foreach($racks as $rack)
-                                <option value="{{ $rack->id }}">{{ strtoupper($rack->rack_number) }}</option>
+                        <select class="form-select" id="subcategory-filter" name="subcategory_id" style="width: auto; min-width: 200px;">
+                            <option value="">All SubCategories</option>
+                            @foreach($subcategories as $subcategory)
+                                <option value="{{ $subcategory->id }}">{{ strtoupper($subcategory->subcategory_name) }}</option>
                             @endforeach
                         </select>
-                        <a href="{{ route('location.create') }}" class="btn btn-primary">
+                        <a href="{{ route('mapping.create') }}" class="btn btn-primary">
                             <i class="bi bi-plus-circle-fill me-2"></i>
-                            Add Location
+                            Add Mapping
                         </a>
                     </div>
                 </div>
@@ -69,7 +69,7 @@
     <!-- 列表内容 -->
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
-            <div id="table-body" class="location-list">
+            <div id="table-body" class="mapping-list">
                 <!-- 内容将由 JavaScript 动态生成 -->
             </div>
         </div>
@@ -120,25 +120,25 @@ function previewImage(src) {
 }
 
 $(document).ready(function () {
-    const $locationList = $("#table-body");
+    const $mappingList = $("#table-body");
     const $pagination = $("#pagination");
-    const $zoneFilter = $("#zone-filter");
-    const $rackFilter = $("#rack-filter");
+    const $categoryFilter = $("#category-filter");
+    const $subcategoryFilter = $("#subcategory-filter");
     const $prevPage = $("#prev-page");
     const $nextPage = $("#next-page");
     const $showingStart = $("#showing-start");
     const $showingEnd = $("#showing-end");
     const $totalCount = $("#total-count");
 
-    function fetchLocations(page = 1) {
-        $.get("{{ route('location.index') }}", {
+    function fetchMappings(page = 1) {
+        $.get("{{ route('mapping.index') }}", {
             page,
-            zone_id: $zoneFilter.val(),
-            rack_id: $rackFilter.val(),
+            category_id: $categoryFilter.val(),
+            subcategory_id: $subcategoryFilter.val(),
             perPage: 10
         }, function (response) {
             if (response.data.length > 0) {
-                renderLocations(response.data);
+                renderMappings(response.data);
                 updatePaginationInfo(response);
             } else {
                 showNoResults();
@@ -147,70 +147,74 @@ $(document).ready(function () {
         });
     }
 
-    function renderLocations(locations) {
-        // 按 zone 分组
-        const groupedLocations = {};
-        locations.forEach(location => {
-            if (!groupedLocations[location.zone.id]) {
-                groupedLocations[location.zone.id] = {
-                    zone: location.zone,
-                    racks: []
+    function renderMappings(mappings) {
+        // 按 category 分组
+        const groupedMappings = {};
+        mappings.forEach(mapping => {
+            if (!groupedMappings[mapping.category.id]) {
+                groupedMappings[mapping.category.id] = {
+                    category: mapping.category,
+                    subcategories: []
                 };
             }
-            groupedLocations[location.zone.id].racks.push({
-                ...location.rack,
-                location_id: location.id  // 添加 location_id
+            groupedMappings[mapping.category.id].subcategories.push({
+                ...mapping.subcategory,
+                mapping_id: mapping.id
             });
         });
 
         // 渲染分组后的数据
-        $locationList.html(Object.values(groupedLocations).map(group => `
-            <div class="location-group">
-                <div class="location-zone">
+        $mappingList.html(Object.values(groupedMappings).map(group => `
+            <div class="mapping-group">
+                <div class="mapping-category">
                     <div class="d-flex align-items-center p-4">
-                        <div class="zone-icon-wrapper me-4">
-                            ${group.zone.zone_image ? `
-                                <img src="/assets/images/${group.zone.zone_image}" alt="Zone Image"
-                                     class="zone-image" onclick="previewImage('/assets/images/${group.zone.zone_image}')">
+                        <div class="category-icon-wrapper me-4">
+                            ${group.category.category_image ? `
+                                <img src="/assets/images/${group.category.category_image}" alt="Category Image"
+                                     class="category-image" onclick="previewImage('/assets/images/${group.category.category_image}')">
                             ` : `
-                                <div class="zone-icon">
-                                    <i class="bi bi-geo-alt"></i>
+                                <div class="category-icon">
+                                    <i class="bi bi-folder"></i>
                                 </div>
                             `}
                         </div>
-                        <div class="zone-info">
-                            <div class="zone-title fw-bold">${group.zone.zone_name.toUpperCase()}</div>
-                            <div class="zone-meta">
-                                <span class="rack-count">
-                                    <i class="bi bi-box-seam me-2"></i>
-                                    ${group.racks.length} Racks
-                                </span>
-                                <span class="location-text">
-                                    <i class="bi bi-geo-alt me-2"></i>
-                                    ${group.zone.location.toUpperCase()}
+                        <div class="category-info">
+                            <div class="category-title fw-bold">${group.category.category_name.toUpperCase()}</div>
+                            <div class="category-meta">
+                                <span class="subcategory-count">
+                                    <i class="bi bi-diagram-2 me-2"></i>
+                                    ${group.subcategories.length} Subcategories
                                 </span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="location-racks">
-                    ${group.racks.map(rack => `
-                        <div class="location-rack">
+                <div class="mapping-subcategories">
+                    ${group.subcategories.map(subcategory => `
+                        <div class="mapping-subcategory">
                             <div class="d-flex align-items-center justify-content-between p-3">
                                 <div class="d-flex align-items-center">
                                     <div class="ms-4">
                                         <i class="bi bi-arrow-right-short text-primary me-2"></i>
-                                        <span class="text-muted">${rack.rack_number.toUpperCase()}</span>
-                                        <span class="rack-capacity ms-2">(Capacity: ${rack.capacity})</span>
+                                        ${subcategory.subcategory_image ? `
+                                            <img src="/assets/images/${subcategory.subcategory_image}" alt="SubCategory Image"
+                                                 class="subcategory-image me-2" style="width: 32px; height: 32px; object-fit: cover; border-radius: 4px;"
+                                                 onclick="previewImage('/assets/images/${subcategory.subcategory_image}')">
+                                        ` : `
+                                            <div class="subcategory-icon me-2">
+                                                <i class="bi bi-folder"></i>
+                                            </div>
+                                        `}
+                                        <span class="text-muted">${subcategory.subcategory_name.toUpperCase()}</span>
                                     </div>
                                 </div>
                                 <div class="action-buttons">
-                                    <a href="{{ route('location.edit', '') }}/${rack.location_id}" class="btn-action" title="Edit">
+                                    <a href="{{ route('mapping.edit', '') }}/${subcategory.mapping_id}" class="btn-action" title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <form action="{{ route('location.destroy', '') }}/${rack.location_id}" method="POST"
+                                    <form action="{{ route('mapping.destroy', '') }}/${subcategory.mapping_id}" method="POST"
                                         style="display: inline-block;"
-                                        onsubmit="return confirm('Are you sure you want to delete this location?');">
+                                        onsubmit="return confirm('Are you sure you want to delete this mapping?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn-action delete" title="Delete">
@@ -236,7 +240,7 @@ $(document).ready(function () {
     }
 
     function showNoResults() {
-        $locationList.empty();
+        $mappingList.empty();
         $showingStart.text('0');
         $showingEnd.text('0');
         $totalCount.text('0');
@@ -277,24 +281,24 @@ $(document).ready(function () {
     }
 
     // 事件监听
-    $zoneFilter.on("change", function() {
-        fetchLocations(1);
+    $categoryFilter.on("change", function() {
+        fetchMappings(1);
     });
 
-    $rackFilter.on("change", function() {
-        fetchLocations(1);
+    $subcategoryFilter.on("change", function() {
+        fetchMappings(1);
     });
 
     $pagination.on("click", ".pagination-btn", function(e) {
         e.preventDefault();
-        fetchLocations($(this).data("page"));
+        fetchMappings($(this).data("page"));
     });
 
     $prevPage.on('click', 'a', function(e) {
         e.preventDefault();
         if (!$(this).parent().hasClass('disabled')) {
             const currentPage = parseInt($('.page-item.active .page-link').data('page'));
-            fetchLocations(currentPage - 1);
+            fetchMappings(currentPage - 1);
         }
     });
 
@@ -302,12 +306,12 @@ $(document).ready(function () {
         e.preventDefault();
         if (!$(this).parent().hasClass('disabled')) {
             const currentPage = parseInt($('.page-item.active .page-link').data('page'));
-            fetchLocations(currentPage + 1);
+            fetchMappings(currentPage + 1);
         }
     });
 
     // 初始化加载
-    fetchLocations();
+    fetchMappings();
 });
 </script>
 @endsection

@@ -6,42 +6,71 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use App\Models\User;
 
 class AuthController extends Controller
 {
-    // public function index() {
-    //     $user = Auth::user();
+    public function index() {
+        try {
+            $user = Auth::user();
 
-    //     return match ($user->role) {
-    //         'admin' => view('admin.dashboard'),
-    //         'staff' => view('staff.dashboard'),
-    //         default => abort(403, 'You do not have permission to access this resource.'),
-    //     };
-    // }
+            return match ($user->role) {
+                'admin' => view('admin.dashboard'),
+                'staff' => view('staff.dashboard'),
+                default => abort(403, 'You do not have permission to access this resource.'),
+            };
+        } catch (\Exception $e) {
+            \Log::error('Error in AuthController@index: ' . $e->getMessage());
+            return redirect()->route('login')
+                            ->with('error', 'You do not have permission to access this resource.');
+        }
+    }
 
-    private const ROLE_ADMIN = 'admin';
-    private const ROLE_STAFF = 'staff';
-
-    /** Show the login form. */
     public function showLoginForm() {
         return view('auth.login');
     }
 
     public function login(Request $request) {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required', 'min:6'],
-        ]);
+        try {
+            $request->validate([
+                'email' => ['required', 'email'],
+                'password' => ['required', 'min:6'],
+            ]);
 
-        if (Auth::attempt($credentials)) {
+            if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+                \Log::error('Failed login attempt: ' . $request->email);
+                return redirect()->back()
+                                ->withErrors(['email' => 'The provided credentials do not match our records.'])
+                                ->onlyInput('email');
+            }
+
             $request->session()->regenerate();
-            return $this->redirectBasedOnRole(Auth::user());
-        }
+            $user = Auth::user();
 
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ])->onlyInput('email');
+            if ($user->role === 'admin') {
+                return redirect()->intended(route('admin.dashboard'))
+                                ->with('success', 'You are logged in successfully');
+            }
+
+            if ($user->role === 'staff') {
+                return redirect()->intended(route('staff.dashboard'))
+                                ->with('success', 'You are logged in successfully');
+            }
+
+            Auth::logout();
+            $request->session()->invalidate();
+            \Log::error('Invalid role access attempt: ' . $user->email);
+            return redirect()->back()
+                            ->withErrors(['email' => 'Your account does not have the correct permissions.'])
+                            ->onlyInput('email');
+
+        } catch (\Exception $e) {
+            \Log::error('Error in AuthController@login: ' . $e->getMessage());
+            return redirect()->route('login')
+                            ->withErrors(['error' => 'An error occurred while logging in. Please try again.'])
+                            ->onlyInput('email');
+        }
     }
 
     public function showRegisterForm() {
@@ -49,55 +78,46 @@ class AuthController extends Controller
     }
 
     public function register(Request $request) {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:6', 'confirmed'],
-        ]);
-
         try {
-            $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => Hash::make($validated['password']),
+            $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+                'password' => ['required', 'string', 'min:6', 'confirmed'],
+                'role' => ['nullable', 'string', 'in:admin,staff'],
             ]);
 
-            return redirect()->route('user.list')
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => $request->role ?? 'staff',
+            ]);
+
+            return redirect()->route('user.index')
                             ->with('success', 'Staff member has been successfully added.');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Registration failed. Please try again.']);
+            \Log::error('Error in AuthController@register: ' . $e->getMessage());
+            return redirect()->back()
+                            ->withErrors(['error' => 'Registration failed. Please try again.']);
         }
-    }
-
-    private function redirectBasedOnRole(?User $user): \Illuminate\Http\RedirectResponse
-    {
-        if (!$user) {
-            return $this->logoutWithError(request());
-        }
-
-        return match ($user->role) {
-            'admin' => redirect()->intended(route('admin.dashboard'))
-                                ->with('success', 'You are logged in successfully'),
-            'staff' => redirect()->intended(route('staff.dashboard'))
-                                ->with('success', 'You are logged in successfully'),
-            default => $this->logoutWithError(request()),
-        };
     }
 
     public function logout(Request $request) {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        try {
+            $user = Auth::user();
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
 
-        return redirect(route('login'))->with('success', 'You are logged out successfully');
-    }
+            return redirect()->route('login')
+                            ->with('success', 'You are logged out successfully');
 
-    private function logoutWithError(Request $request) {
-        Auth::logout();
-        $request->session()->invalidate();
-        return back()->withErrors([
-            'email' => 'Your account does not have the correct permissions.',
-        ])->onlyInput('email');
+        } catch (\Exception $e) {
+            \Log::error('Error in AuthController@logout: ' . $e->getMessage());
+            return redirect()->route('login')
+                            ->withErrors(['error' => 'An error occurred during logout. Please try again.'])
+                            ->onlyInput('email');
+        }
     }
 }
 

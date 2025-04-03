@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin\StorageLocation;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use App\Models\Rack;
+use App\Models\Storage\Rack;
 
 class RackController extends Controller
 {
@@ -14,13 +14,17 @@ class RackController extends Controller
             if ($request->ajax()) {
                 $query = Rack::query();
 
-            // 机架筛选
-            if ($request->filled('filter') && $request->input('filter') !== '') {
-                $query->where('id', $request->input('filter'));
-            }
+                // 机架名称筛选
+                $query->when($request->filled('search'), function ($query) use ($request) {
+                    $query->where('rack_number', 'like', '%' . $request->search . '%');
+                })
+                // 机架筛选
+                ->when($request->filled('rack_id'), function ($query) use ($request) {
+                    $query->where('id', $request->input('rack_id'));
+                });
 
-            $perPage = $request->input('perPage', 10);
-            $page = $request->input('page', 1);
+                $perPage = $request->input('perPage', 10);
+                $page = $request->input('page', 1);
 
             $racks = $query->paginate($perPage, ['*'], 'page', $page);
 
@@ -53,7 +57,6 @@ class RackController extends Controller
 
         } catch (\Exception $e) {
             \Log::error('Rack index error: ' . $e->getMessage());
-
             if ($request->ajax()) {
                 return response()->json(['error' => 'Failed to load racks'], 500);
             }
@@ -82,7 +85,6 @@ class RackController extends Controller
             return redirect()->route('rack.index')->with('success', 'Rack created successfully');
         } catch (\Exception $e) {
             \Log::error('Rack creation error: ' . $e->getMessage());
-
             return redirect()->back()
                             ->withInput()
                             ->withErrors(['error' => 'Rack creation failed: ' . $e->getMessage()]);
@@ -90,7 +92,7 @@ class RackController extends Controller
     }
 
     public function edit($id) {
-        $rack = Rack::find($id);
+        $rack = Rack::findOrFail($id);
         return view('storage_location.rack.update', compact('rack'));
     }
 
@@ -101,7 +103,7 @@ class RackController extends Controller
                 'capacity' => 'nullable|integer|min:1',
             ]);
 
-            $rack = Rack::find($id);
+            $rack = Rack::findOrFail($id);
 
             if (!$rack) {
                 return redirect()->back()
@@ -115,7 +117,6 @@ class RackController extends Controller
             return redirect()->route('rack.index')->with('success', 'Rack updated successfully');
         } catch (\Exception $e) {
             \Log::error('Rack update error: ' . $e->getMessage());
-
             return redirect()->back()
                             ->withInput()
                             ->withErrors(['error' => 'Rack update failed: ' . $e->getMessage()]);
@@ -126,8 +127,9 @@ class RackController extends Controller
         try {
             $rack = Rack::findOrFail($id);
 
-            if ($rack->storageLocations()->exists()) {
-                return redirect()->route('rack.index')
+            // 检查是否有关联的存储位置
+            if ($rack->locations()->exists()) {
+                return redirect()->back()
                                 ->withErrors(['error' => 'Cannot delete this rack because storage locations are still linked to it.']);
             }
 
@@ -137,7 +139,6 @@ class RackController extends Controller
                             ->with('success', 'Rack deleted successfully');
         } catch (\Exception $e) {
             \Log::error('Rack deletion error: ' . $e->getMessage());
-
             return redirect()->back()
                             ->withErrors(['error' => 'Rack deletion failed: ' . $e->getMessage()]);
         }

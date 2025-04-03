@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin\StorageLocation;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use App\Models\Zone;
+use App\Models\Storage\Zone;
 
 class ZoneController extends Controller
 {
@@ -14,10 +14,14 @@ class ZoneController extends Controller
             if ($request->ajax()) {
                 $query = Zone::query();
 
+                // 区域名称筛选
+                $query->when($request->filled('search'), function ($query) use ($request) {
+                    $query->where('location', 'like', '%' . $request->search . '%');
+                })
                 // 区域筛选
-                if ($request->filled('filter') && $request->input('filter') !== '') {
-                    $query->where('id', $request->input('filter'));
-                }
+                ->when($request->filled('zone_id'), function ($query) use ($request) {
+                    $query->where('id', $request->input('zone_id'));
+                });
 
                 $perPage = $request->input('perPage', 10);
                 $page = $request->input('page', 1);
@@ -53,7 +57,6 @@ class ZoneController extends Controller
 
         } catch (\Exception $e) {
             \Log::error('Failed to load zones: ' . $e->getMessage());
-
             if ($request->ajax()) {
                 return response()->json(['error' => 'Failed to load zones'], 500);
             }
@@ -84,7 +87,7 @@ class ZoneController extends Controller
             // 处理图片上传
             $image = $request->file('zone_image');
             $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $directory = public_path('assets/zones');
+            $directory = public_path('assets/images/zones');
 
             // 确保目录存在
             if (!file_exists($directory)) {
@@ -117,7 +120,7 @@ class ZoneController extends Controller
     }
 
     public function edit($id) {
-        $zone = Zone::find($id);
+        $zone = Zone::findOrFail($id);
         return view('storage_location.zone.update', compact('zone'));
     }
 
@@ -129,7 +132,7 @@ class ZoneController extends Controller
                 'location' => 'required|string|max:255',
             ]);
 
-            $zone = Zone::find($id);
+            $zone = Zone::findOrFail($id);
 
             if (!$zone) {
                 return redirect()->back()
@@ -139,7 +142,7 @@ class ZoneController extends Controller
             if ($request->hasFile('zone_image')) {
                 // 删除旧图片
                 if ($zone->zone_image) {
-                    $imagePath = public_path('assets/' . $zone->zone_image);
+                    $imagePath = public_path('assets/images/' . $zone->zone_image);
                     if (file_exists($imagePath)) {
                         unlink($imagePath);
                     }
@@ -148,7 +151,7 @@ class ZoneController extends Controller
                 // 处理新图片上传
                 $image = $request->file('zone_image');
                 $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-                $directory = public_path('assets/zones');
+                $directory = public_path('assets/images/zones');
 
                 if (!file_exists($directory)) {
                     mkdir($directory, 0777, true);
@@ -177,14 +180,14 @@ class ZoneController extends Controller
             $zone = Zone::findOrFail($id);
 
             // 检查是否有关联的存储位置
-            if ($zone->storageLocations()->exists()) {
-                return redirect()->route('zone.index')
+            if ($zone->locations()->exists()) {
+                return redirect()->back()
                                 ->withErrors(['error' => 'Cannot delete this zone because storage locations are still linked to it.']);
             }
 
             // 删除图片文件
             if ($zone->zone_image) {
-                $imagePath = public_path('assets/' . $zone->zone_image);
+                $imagePath = public_path('assets/images/' . $zone->zone_image);
                 if (file_exists($imagePath)) {
                     unlink($imagePath);
                 }
@@ -198,7 +201,7 @@ class ZoneController extends Controller
 
         } catch (\Exception $e) {
             \Log::error('Zone deletion error: ' . $e->getMessage());
-            return redirect()->route('zone.index')
+            return redirect()->back()
                             ->withErrors(['error' => 'Failed to delete zone: ' . $e->getMessage()]);
         }
     }

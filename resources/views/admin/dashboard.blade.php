@@ -12,7 +12,7 @@
         </div>
     @endif
 
-    <div class="container">
+    {{-- <div class="container">
         <div class="row g-3">
             <div class="col-sm-12 col-md-6 col-lg-4">
                 <a href="{{ route('users') }}" class="text-decoration-none">
@@ -53,10 +53,10 @@
                 </a>
             </div>
         </div>
-    </div>
+    </div> --}}
 </div>
 
-<script>
+{{-- <script>
 // 获取用户数据
 var totalUsers = {{ $totalCount }};
 var adminUsers = {{ $adminCount }};
@@ -111,5 +111,5 @@ updateUserCount();
 
 // 每 5 秒自动更新用户数据
 setInterval(updateUserCount, 5000);
-</script>
+</script> --}}
 @endsection

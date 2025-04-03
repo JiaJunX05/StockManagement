@@ -74,7 +74,7 @@
 
                     <!-- 预览图片 -->
                     <div class="preview-container flex-grow-1 d-flex align-items-center justify-content-center">
-                        <img src="{{ asset('assets/' . $zone->zone_image) }}" alt="Preview" id="preview-image"
+                        <img src="{{ asset('assets/images/' . $zone->zone_image) }}" alt="Preview" id="preview-image"
                             class="img-fluid rounded-3" style="max-width: 100%; max-height: 280px; object-fit: contain;">
                     </div>
                 </div>
@@ -134,8 +134,25 @@
     </div>
 </div>
 
+<script>
+    // This code is used to preview the selected image in the product form
+    const previewIcon = document.querySelector('#preview-icon');    // 默认显示的图标
+    const previewImage = document.querySelector('#preview-image');  // 预览图片的 <img> 标签
+    const input = document.querySelector('#zone_image');           // 文件上传的 <input>
+
+    input.addEventListener('change', () => {
+        const file = input.files[0]; // 获取用户选择的文件
+        if (file && file.type.startsWith('image/')) { // 检查是否为图片文件
+            previewImage.src = URL.createObjectURL(file); // 设置预览图片的 src 属性
+            previewIcon.classList.add('d-none');         // 隐藏图标
+            previewImage.classList.remove('d-none');     // 显示图片
+        } else {
+            alert('Please select a valid image file!'); // 提示用户选择正确的文件
+            // 重置预览状态
+            previewIcon.classList.remove('d-none');     // 显示图标
+            previewImage.classList.add('d-none');       // 隐藏图片
+        }
+    });
+</script>
 @endsection
 
-@section('scripts')
-    <script src="{{ asset('assets/js/zone.js') }}"></script>
-@endsection

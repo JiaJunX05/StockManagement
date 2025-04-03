@@ -1,5 +1,5 @@
 <!-- CSS 檔案連結 -->
-<link rel="stylesheet" href="{{ asset('assets/css/footer.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/layouts/footer.css') }}">
 
 <!-- Footer -->
 <footer class="custom-footer">

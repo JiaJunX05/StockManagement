@@ -1,9 +1,9 @@
 @extends("admin.layouts.app")
 
-@section("title", "Zone Management")
+@section("title", "Brand Management")
 @section("content")
 
-<link rel="stylesheet" href="{{ asset('assets/css/storage/zone.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/brands.css') }}">
 <div class="container py-4">
     <!-- 提示信息 -->
     @if(session('success'))
@@ -24,25 +24,25 @@
         </div>
     @endif
 
-        <!-- 页面标题和添加按钮 -->
+    <!-- 页面标题和添加按钮 -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body">
             <div class="row justify-content-between align-items-center g-3">
                 <div class="col-12 col-md-6">
                     <div class="d-flex align-items-center">
                         <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
-                            <i class="bi bi-people-fill text-primary fs-4"></i>
+                            <i class="bi bi-tag text-primary fs-4"></i>
                         </div>
                         <div>
-                            <h3 class="mb-0 fw-bold">Zone Management</h3>
-                            <p class="text-muted mb-0">Manage your zones</p>
+                            <h3 class="mb-0 fw-bold">Brand Management</h3>
+                            <p class="text-muted mb-0">Manage your product brands</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-12 col-md-6 text-md-end">
-                    <a href="{{ route('zone.create') }}" class="btn btn-primary">
+                    <a href="{{ route('brand.create') }}" class="btn btn-primary">
                         <i class="bi bi-plus-circle-fill me-2"></i>
-                        Add Zone
+                        Add Brand
                     </a>
                 </div>
             </div>
@@ -56,14 +56,14 @@
                 <div class="col-lg-9">
                     <div class="search-box">
                         <i class="bi bi-search search-icon"></i>
-                        <input type="search" class="form-control search-input" id="search-input" placeholder="Search by location...">
+                        <input type="search" class="form-control search-input" id="search-input" placeholder="Search by brand name...">
                     </div>
                 </div>
                 <div class="col-lg-3">
-                    <select class="form-select filter-select" id="zone-filter" name="zone_id">
-                        <option value="">All Zones</option>
-                        @foreach($zones as $zone)
-                            <option value="{{ $zone->id }}">{{ strtoupper($zone->zone_name) }}</option>
+                    <select class="form-select filter-select" id="brand-filter" name="brand_id">
+                        <option value="">All Brands</option>
+                        @foreach($brands as $brand)
+                            <option value="{{ $brand->id }}">{{ strtoupper($brand->brand_name) }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -71,7 +71,7 @@
         </div>
     </div>
 
-    <!-- 区域列表表格 -->
+    <!-- 品牌列表表格 -->
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -79,10 +79,9 @@
                     <thead>
                         <tr>
                             <th class="ps-4" style="width: 10%"><div class="table-header">ID</div></th>
-                            <th style="width: 15%"><div class="table-header">ZONE IMAGE</div></th>
-                            <th style="width: 15%"><div class="table-header">ZONE NAME</div></th>
-                            <th style="width: 50%"><div class="table-header">ZONE LOCATION</div></th>
-                            <th class="text-end pe-4" style="width: 10%"><div class="table-header">ACTIONS</div></th>
+                            <th style="width: 15%"><div class="table-header">BRAND IMAGE</div></th>
+                            <th style="width: 15%"><div class="table-header">BRAND NAME</div></th>
+                            <th class="text-end pe-4" style="width: 60%"><div class="table-header">ACTIONS</div></th>
                         </tr>
                     </thead>
                     <tbody id="table-body"></tbody>
@@ -140,22 +139,22 @@ $(document).ready(function () {
     const $tableBody = $("#table-body");
     const $pagination = $("#pagination");
     const $searchInput = $("#search-input");
-    const $zoneFilter = $("#zone-filter");
+    const $brandFilter = $("#brand-filter");
     const $prevPage = $("#prev-page");
     const $nextPage = $("#next-page");
     const $showingStart = $("#showing-start");
     const $showingEnd = $("#showing-end");
     const $totalCount = $("#total-count");
 
-    function fetchZones(page = 1) {
-        $.get("{{ route('zone.index') }}", {
+    function fetchBrands(page = 1) {
+        $.get("{{ route('brand.index') }}", {
             page,
             search: $searchInput.val(),
-            zone_id: $zoneFilter.val(),
+            brand_id: $brandFilter.val(),
             perPage: 10
         }, function (response) {
             if (response.data.length > 0) {
-                renderZones(response.data);
+                renderBrands(response.data);
                 updatePaginationInfo(response);
             } else {
                 showNoResults();
@@ -164,23 +163,22 @@ $(document).ready(function () {
         });
     }
 
-    function renderZones(zones) {
-        $tableBody.html(zones.map(zone => `
+    function renderBrands(brands) {
+        $tableBody.html(brands.map(brand => `
             <tr>
-                <td class="ps-4"><span class="text-muted">#${zone.id}</span></td>
+                <td class="ps-4"><span class="text-muted">#${brand.id}</span></td>
                 <td>
-                    <img src="/assets/images/${zone.zone_image}" alt="Zone Image"
-                         class="img-fluid w-50 h-50 object-fit-cover preview-image  cursor-pointer"
-                         onclick="previewImage('/assets/images/${zone.zone_image}')">
+                    <img src="/assets/images/${brand.brand_image}" alt="Brand Image"
+                         class="img-fluid w-50 h-50 object-fit-cover preview-image cursor-pointer"
+                         onclick="previewImage('/assets/images/${brand.brand_image}')">
                 </td>
-                <td><span class="fw-medium">${zone.zone_name.toUpperCase()}</span></td>
-                <td><span class="fw-medium">${zone.location.toUpperCase()}</span></td>
+                <td><span class="fw-medium">${brand.brand_name.toUpperCase()}</span></td>
                 <td class="text-end pe-4">
                     <div class="action-buttons">
-                        <a href="{{ route('zone.edit', '') }}/${zone.id}" class="btn-action" title="Edit">
+                        <a href="{{ route('brand.edit', '') }}/${brand.id}" class="btn-action" title="Edit">
                             <i class="bi bi-pencil"></i>
                         </a>
-                        <form action="{{ route('zone.destroy', '') }}/${zone.id}" method="POST" style="display: inline-block;" onsubmit="return confirm('Are you sure you want to delete this zone?');">
+                        <form action="{{ route('brand.destroy', '') }}/${brand.id}" method="POST" style="display: inline-block;" onsubmit="return confirm('Are you sure you want to delete this brand?');">
                             @csrf
                             @method('DELETE')
 
@@ -245,23 +243,23 @@ $(document).ready(function () {
 
     // 事件监听
     $searchInput.on("keyup", function() {
-        fetchZones(1);
+        fetchBrands(1);
     });
 
-    $zoneFilter.on("change", function() {
-        fetchZones(1);
+    $brandFilter.on('change', function() {
+        fetchBrands(1);
     });
 
     $pagination.on("click", ".pagination-btn", function(e) {
         e.preventDefault();
-        fetchZones($(this).data("page"));
+        fetchBrands($(this).data("page"));
     });
 
     $prevPage.on('click', 'a', function(e) {
         e.preventDefault();
         if (!$(this).parent().hasClass('disabled')) {
             const currentPage = parseInt($('.page-item.active .page-link').data('page'));
-            fetchZones(currentPage - 1);
+            fetchBrands(currentPage - 1);
         }
     });
 
@@ -269,12 +267,12 @@ $(document).ready(function () {
         e.preventDefault();
         if (!$(this).parent().hasClass('disabled')) {
             const currentPage = parseInt($('.page-item.active .page-link').data('page'));
-            fetchZones(currentPage + 1);
+            fetchBrands(currentPage + 1);
         }
     });
 
     // 初始化加载
-    fetchZones();
+    fetchBrands();
 });
 </script>
 @endsection

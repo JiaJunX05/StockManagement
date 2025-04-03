@@ -1,6 +1,6 @@
 @extends("admin.layouts.app")
 
-@section("title", "Create Zone")
+@section("title", "Create Brand")
 @section("content")
 
 <style>
@@ -47,11 +47,11 @@
                         <i class="bi bi-plus-circle-fill text-primary fs-4"></i>
                     </div>
                     <div>
-                        <h4 class="mb-0 fw-bold">Create Zone</h4>
-                        <p class="text-muted mb-0">Add a new zone to categorize and manage stock locations</p>
+                        <h4 class="mb-0 fw-bold">Create Brand</h4>
+                        <p class="text-muted mb-0">Add a new brand to categorize and manage products</p>
                     </div>
                 </div>
-                <a href="{{ route('zone.index') }}" class="btn btn-primary"">
+                <a href="{{ route('brand.index') }}" class="btn btn-primary">
                     <i class="bi bi-arrow-left me-2"></i>Back to List
                 </a>
             </div>
@@ -61,7 +61,7 @@
     <!-- 主要内容卡片 -->
     <div class="card shadow-sm border-0">
         <div class="row g-0">
-            <!-- 左侧预览区域 - 使用 product create 的样式 -->
+            <!-- 左侧预览区域 -->
             <div class="col-md-5">
                 <div class="preview-section d-flex flex-column h-100 bg-light p-3">
                     <!-- 预览标题 -->
@@ -78,7 +78,7 @@
                             <i class="bi bi-image text-primary" id="preview-icon" style="font-size: 8rem;"></i>
                             <img src="" alt="Preview" id="preview-image" class="img-fluid rounded-3 d-none"
                                 style="max-width: 100%; max-height: 280px; object-fit: contain;">
-                            <p class="text-muted mt-3">Upload Zone Image</p>
+                            <p class="text-muted mt-3">Upload Brand Image</p>
                         </div>
                     </div>
                 </div>
@@ -88,19 +88,19 @@
             <div class="col-md-7">
                 <div class="card-body p-4">
                     <!-- 表单标题 -->
-                    <h2 class="text-primary text-center mb-3">Create Zone</h2>
-                    <p class="text-muted text-center">Add a new zone to categorize and manage stock locations</p>
+                    <h2 class="text-primary text-center mb-3">Create Brand</h2>
+                    <p class="text-muted text-center">Add a new brand to categorize and manage products</p>
                     <hr>
 
                     <!-- 表单内容 -->
-                    <form action="{{ route('zone.store') }}" method="post" enctype="multipart/form-data">
+                    <form action="{{ route('brand.store') }}" method="post" enctype="multipart/form-data">
                         @csrf
 
                         <div class="mb-4">
-                            <label for="zone_image" class="form-label fw-bold">Zone Image</label>
+                            <label for="brand_image" class="form-label fw-bold">Brand Image</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-end-0"><i class="bi bi-upload text-primary"></i></span>
-                                <input type="file" class="form-control border-start-0" id="zone_image" name="zone_image" required>
+                                <input type="file" class="form-control border-start-0" id="brand_image" name="brand_image" required>
                             </div>
                             <div class="form-text">
                                 <i class="bi bi-info-circle me-2"></i>
@@ -109,24 +109,16 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="zone_name" class="form-label fw-bold">Zone Name</label>
+                            <label for="brand_name" class="form-label fw-bold">Brand Name</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-tag text-primary me-2"></i></span>
-                                <input type="text" class="form-control border-start-0" id="zone_name" name="zone_name" placeholder="Enter zone name" required>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="location" class="form-label fw-bold">Zone Location</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-geo-alt text-primary me-2"></i></span>
-                                <input type="text" class="form-control border-start-0" id="location" name="location" placeholder="Enter zone location" required>
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-tag text-primary"></i></span>
+                                <input type="text" class="form-control border-start-0" id="brand_name" name="brand_name" placeholder="Enter brand name" required>
                             </div>
                         </div>
 
                         <hr class="my-4">
                         <button type="submit" class="btn btn-primary w-100">
-                            <i class="bi bi-plus-circle-fill me-2"></i>Create Zone
+                            <i class="bi bi-plus-circle-fill me-2"></i>Create Brand
                         </button>
                     </form>
                 </div>
@@ -136,10 +128,10 @@
 </div>
 
 <script>
-    // This code is used to preview the selected image in the product form
+    // This code is used to preview the selected image in the brand form
     const previewIcon = document.querySelector('#preview-icon');    // 默认显示的图标
     const previewImage = document.querySelector('#preview-image');  // 预览图片的 <img> 标签
-    const input = document.querySelector('#zone_image');           // 文件上传的 <input>
+    const input = document.querySelector('#brand_image');           // 文件上传的 <input>
 
     input.addEventListener('change', () => {
         const file = input.files[0]; // 获取用户选择的文件

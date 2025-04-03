@@ -1,16 +1,14 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Storage;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Zone;
-use App\Models\Rack;
-use App\Models\SKU;
+use App\Models\Storage\Zone;
+use App\Models\Storage\Rack;
 
-class StorageLocation extends Model
+class Location extends Model
 {
     use HasFactory;
 

@@ -99,7 +99,7 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="capacity" class="form-label fw-bold">Capacity</label>
+                            <label for="capacity" class="form-label fw-bold">Rack Capacity</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-end-0"><i class="bi bi-boxes text-primary"></i></span>
                                 <input type="number" class="form-control border-start-0" id="capacity" name="capacity" placeholder="Enter rack capacity (default: 50)">

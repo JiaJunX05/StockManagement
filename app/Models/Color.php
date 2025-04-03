@@ -7,17 +7,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Product;
 
-class Category extends Model
+class Color extends Model
 {
     use HasFactory;
 
-    protected $table = 'categories';
+    protected $table = 'colors';
 
     protected $fillable = [
-        'category_name',
+        'color_name',
+        'hex_code',
     ];
 
     public function products(): HasMany {
-        return $this->hasMany(Product::class);
+        return $this->hasMany(Product::class, 'color_id');
     }
 }

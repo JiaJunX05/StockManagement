@@ -1,5 +1,5 @@
 <!-- CSS 檔案連結 -->
-<link rel="stylesheet" href="{{ asset('assets/css/header.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/layouts/header.css') }}">
 
 <!-- Header -->
 <nav class="navbar navbar-expand-xl custom-navbar">
@@ -20,8 +20,8 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <!-- Staff -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('users') }}">
-                        <i class="bi bi-people-fill menu-icon me-2"></i><span>Staff</span>
+                    <a class="nav-link" href="{{ route('user.index') }}">
+                        <i class="bi bi-people-fill menu-icon me-2"></i><span>Staff Management</span>
                     </a>
                 </li>
 
@@ -53,23 +53,43 @@
                 <!-- Category & Subcategory Management -->
                 <li class="nav-item dropdown menu-item">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-diagram-3 menu-icon me-2"></i><span>Categories</span>
+                        <i class="bi bi-diagram-3 menu-icon me-2"></i><span>Category Mapping</span>
                     </a>
                     <ul class="dropdown-menu custom-dropdown">
                         <li>
-                            <a class="dropdown-item" href="{{ route('category.create') }}">
-                                <i class="bi bi-folder-plus me-2"></i><span>Create Category</span>
+                            <a class="dropdown-item" href="{{ route('category.index') }}">
+                                <i class="bi bi-folder-plus me-2"></i><span>Manage Category</span>
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="{{ route('category.create') }}">
-                                <i class="bi bi-folder-symlink me-2"></i><span>Create Subcategory</span>
+                            <a class="dropdown-item" href="{{ route('subcategory.index') }}">
+                                <i class="bi bi-folder-symlink me-2"></i><span>Manage Subcategory</span>
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
-                            <a class="dropdown-item" href="{{ route('category.list') }}">
-                                <i class="bi bi-folder-fill me-2"></i><span>View Categories</span>
+                            <a class="dropdown-item" href="{{ route('mapping.index') }}">
+                                <i class="bi bi-folder-fill me-2"></i><span>Category Mapping</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Brand & Color Management -->
+                <li class="nav-item dropdown menu-item">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-palette menu-icon me-2"></i><span>Brand & Color</span>
+                    </a>
+                    <ul class="dropdown-menu custom-dropdown">
+                        <li>
+                            <a class="dropdown-item" href="{{ route('brand.index') }}">
+                                <i class="bi bi-tag me-2"></i><span>Manage Brand</span>
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="">
+                                <i class="bi bi-palette-fill me-2"></i><span>Manage Color</span>
                             </a>
                         </li>
                     </ul>

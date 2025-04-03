@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('subcategories', function (Blueprint $table) {
             $table->id();
+            $table->string('subcategory_image', 255)->default('default.jpg');
             $table->string('subcategory_name', 255)->unique();
             $table->timestamps();
         });

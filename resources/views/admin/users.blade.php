@@ -56,10 +56,7 @@
                 <div class="col-lg-9">
                     <div class="search-box">
                         <i class="bi bi-search search-icon"></i>
-                        <input type="search"
-                               class="form-control search-input"
-                               id="search-input"
-                               placeholder="Search by name, email or role...">
+                        <input type="search" class="form-control search-input" id="search-input" placeholder="Search by name, email or role...">
                     </div>
                 </div>
                 <div class="col-lg-3">
@@ -132,7 +129,7 @@ $(document).ready(function () {
     const $totalCount = $("#total-count");
 
     function fetchUsers(page = 1, search = "", role = "") {
-        $.get("{{ route('users') }}", {
+        $.get("{{ route('user.index') }}", {
             page,
             search,
             role,

@@ -1,9 +1,9 @@
 @extends("admin.layouts.app")
 
-@section("title", "Admin Panel")
+@section("title", "Rack Management")
 @section("content")
 
-<link rel="stylesheet" href="{{ asset('assets/css/racks.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/storage/rack.css') }}">
 <div class="container py-4">
     <!-- 提示信息 -->
     @if(session('success'))
@@ -35,26 +35,40 @@
                             <i class="bi bi-box-fill text-primary fs-4"></i>
                         </div>
                         <div>
-                            <h3 class="mb-0 fw-bold">Rack List Management</h3>
+                            <h3 class="mb-0 fw-bold">Rack Management</h3>
                             <p class="text-muted mb-0">Manage your racks</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- 右侧功能区 -->
-                <div class="col-12 col-md-6">
-                    <div class="d-flex justify-content-end align-items-center gap-3">
-                        <select class="form-select" id="rack-filter" name="rack_id" style="width: auto; min-width: 200px;">
-                            <option value="">All Racks</option>
-                            @foreach($racks as $rack)
-                                <option value="{{ $rack->id }}">{{ strtoupper($rack->rack_number) }}</option>
-                            @endforeach
-                        </select>
-                        <a href="{{ route('rack.create') }}" class="btn btn-primary">
-                            <i class="bi bi-plus-circle-fill me-2"></i>
-                            Add Rack
-                        </a>
+                <div class="col-12 col-md-6 text-md-end">
+                    <a href="{{ route('rack.create') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle-fill me-2"></i>
+                        Add Rack
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 搜索栏优化 -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-3">
+            <div class="row g-3">
+                <div class="col-lg-9">
+                    <div class="search-box">
+                        <i class="bi bi-search search-icon"></i>
+                        <input type="search" class="form-control search-input" id="search-input" placeholder="Search by rack number...">
                     </div>
+                </div>
+                <div class="col-lg-3">
+                    <select class="form-select filter-select" id="rack-filter" name="rack_id">
+                        <option value="">All Racks</option>
+                        @foreach($racks as $rack)
+                            <option value="{{ $rack->id }}">{{ strtoupper($rack->rack_number) }}</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
         </div>
@@ -108,6 +122,7 @@
 $(document).ready(function () {
     const $tableBody = $("#table-body");
     const $pagination = $("#pagination");
+    const $searchInput = $("#search-input");
     const $rackFilter = $("#rack-filter");
     const $prevPage = $("#prev-page");
     const $nextPage = $("#next-page");
@@ -115,10 +130,11 @@ $(document).ready(function () {
     const $showingEnd = $("#showing-end");
     const $totalCount = $("#total-count");
 
-    function fetchRacks(page = 1, filter = "") {
+    function fetchRacks(page = 1) {
         $.get("{{ route('rack.index') }}", {
             page,
-            filter,
+            search: $searchInput.val(),
+            rack_id: $rackFilter.val(),
             perPage: 10
         }, function (response) {
             if (response.data.length > 0) {
@@ -128,7 +144,6 @@ $(document).ready(function () {
                 showNoResults();
             }
             generatePagination(response);
-            updateRackFilter(response.all_racks);
         });
     }
 
@@ -146,9 +161,8 @@ $(document).ready(function () {
                         <form action="{{ route('rack.destroy', '') }}/${rack.id}" method="POST" style="display: inline-block;" onsubmit="return confirm('Are you sure you want to delete this rack?');">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn-action delete" title="Delete">
-                                <i class="bi bi-trash"></i>
-                            </button>
+
+                            <button type="submit" class="btn-action delete" title="Delete"><i class="bi bi-trash"></i></button>
                         </form>
                     </div>
                 </td>
@@ -207,33 +221,25 @@ $(document).ready(function () {
         $nextPage.toggleClass('disabled', data.current_page === data.last_page);
     }
 
-    function updateRackFilter(racks) {
-        const currentValue = $rackFilter.val();
-        $rackFilter.html(`
-            <option value="">All Racks</option>
-            ${racks.map(rack => `
-                <option value="${rack.id}" ${rack.id === currentValue ? 'selected' : ''}>
-                    ${rack.rack_number.toUpperCase()}
-                </option>
-            `).join('')}
-        `);
-    }
-
     // 事件监听
+    $searchInput.on("keyup", function() {
+        fetchRacks(1);
+    });
+
     $rackFilter.on("change", function() {
-        fetchRacks(1, $(this).val());
+        fetchRacks(1);
     });
 
     $pagination.on("click", ".pagination-btn", function(e) {
         e.preventDefault();
-        fetchRacks($(this).data("page"), $rackFilter.val());
+        fetchRacks($(this).data("page"));
     });
 
     $prevPage.on('click', 'a', function(e) {
         e.preventDefault();
         if (!$(this).parent().hasClass('disabled')) {
             const currentPage = parseInt($('.page-item.active .page-link').data('page'));
-            fetchRacks(currentPage - 1, $rackFilter.val());
+            fetchRacks(currentPage - 1);
         }
     });
 
@@ -241,7 +247,7 @@ $(document).ready(function () {
         e.preventDefault();
         if (!$(this).parent().hasClass('disabled')) {
             const currentPage = parseInt($('.page-item.active .page-link').data('page'));
-            fetchRacks(currentPage + 1, $rackFilter.val());
+            fetchRacks(currentPage + 1);
         }
     });
 
