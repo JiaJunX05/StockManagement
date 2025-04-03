@@ -17,7 +17,9 @@ class Rack extends Model
     protected $table = 'racks';
 
     protected $fillable = [
+        'rack_image',
         'rack_number',
+        'capacity',
     ];
 
     public function zones(): HasManyThrough  {

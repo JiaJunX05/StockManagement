@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('feature', 255)->default('default.jpg');
+            $table->string('cover_image', 255)->default('default.jpg');
             $table->string('name', 255);
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2);
@@ -25,6 +25,7 @@ return new class extends Migration
             $table->foreignId('color_id')->nullable()->constrained('colors')->onDelete('set null');
             $table->foreignId('zone_id')->nullable()->constrained('zones')->onDelete('set null');
             $table->foreignId('rack_id')->nullable()->constrained('racks')->onDelete('set null');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

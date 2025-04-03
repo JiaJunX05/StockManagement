@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('racks', function (Blueprint $table) {
             $table->id();
+            $table->string('rack_image', 255)->default('default.jpg');
             $table->string('rack_number', 255)->unique();
             $table->unsignedInteger('capacity')->default(50);
             $table->timestamps();

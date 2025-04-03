@@ -4,14 +4,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 // use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\Admin\StorageLocation\ZoneController;
-use App\Http\Controllers\Admin\StorageLocation\RackController;
-use App\Http\Controllers\Admin\StorageLocation\LocationController;
-use App\Http\Controllers\Admin\CategoryMapping\CategoryController;
-use App\Http\Controllers\Admin\CategoryMapping\SubCategoryController;
-use App\Http\Controllers\Admin\CategoryMapping\MappingController;
-use App\Http\Controllers\Admin\BrandController;
-use App\Http\Controllers\Admin\ColorController;
+use App\Http\Controllers\Admin\Storage\ZoneController;
+use App\Http\Controllers\Admin\Storage\RackController;
+use App\Http\Controllers\Admin\Storage\LocationController;
+use App\Http\Controllers\Admin\Master\Category\CategoryController;
+use App\Http\Controllers\Admin\Master\Category\SubCategoryController;
+use App\Http\Controllers\Admin\Master\Category\MappingController;
+use App\Http\Controllers\Admin\Master\BrandController;
+use App\Http\Controllers\Admin\Master\ColorController;
 use App\Http\Controllers\Admin\ProductController;
 
 // Guest routes
