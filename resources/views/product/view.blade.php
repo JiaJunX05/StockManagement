@@ -3,137 +3,223 @@
 @section("title", "View Product")
 @section("content")
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card shadow-lg border-0">
-                <div class="row g-0">
+<link rel="stylesheet" href="{{ asset('assets/css/product-view.css') }}">
+<div class="container py-4">
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
 
-                    <div class="col-md-5 d-flex align-items-center justify-content-center p-3 bg-light">
-                        <img src="{{ asset('assets/' . $product->feature) }}"
-                            alt="{{ $product->name }}" class="img-fluid" id="preview-image" style="max-width: 100%; max-height: 300px; object-fit: contain;">
+    @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @foreach ($errors->all() as $error)
+                <div>{{ $error }}</div>
+            @endforeach
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    <!-- 页面标题卡片 -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                        <i class="bi bi-eye-fill text-primary fs-4"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-0 fw-bold">View Product</h4>
+                        <p class="text-muted mb-0">View product details</p>
+                    </div>
+                </div>
+                <a href="{{ route('product.index') }}" class="btn btn-primary">
+                    <i class="bi bi-arrow-left me-2"></i>Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="row g-0">
+            <!-- 左侧图片预览 -->
+            <div class="col-md-5 p-4 bg-light">
+                <div class="text-center">
+                    <img src="{{ asset('assets/images/products/' . $product->cover_image) }}"
+                         alt="{{ $product->name }}"
+                         class="img-fluid rounded mb-3 product-main-image"
+                         id="mainImage">
+
+                    @if ($product->images)
+                        <div class="d-flex gap-2 justify-content-center flex-wrap">
+                            <img src="{{ asset('assets/images/products/' . $product->cover_image) }}"
+                                 alt="Main"
+                                 class="rounded border border-2 border-primary p-1 product-thumbnail"
+                                 onclick="changeImage(this.src)">
+                            @foreach ($product->images as $image)
+                                <img src="{{ asset('assets/images/products/' . $image->detail_image) }}"
+                                     alt="Detail"
+                                     class="rounded border p-1 product-thumbnail"
+                                     onclick="changeImage(this.src)">
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- 右侧产品信息 -->
+            <div class="col-md-7">
+                <div class="p-4">
+                    <h1 class="h3 fw-bold mb-3">{{ $product->name }}</h1>
+
+                    <div class="d-flex align-items-center gap-3 mb-4 text-muted">
+                        <div class="text-warning">
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-half"></i>
+                        </div>
+                        <span>4.8</span>
+                        <span>|</span>
+                        <span>1.4k Ratings</span>
                     </div>
 
-                    <div class="col-md-7">
-                        <div class="card-body p-4">
-                            <div class="container text-center">
-                                <!-- Success Alert -->
-                                @if(session('success'))
-                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                        {{ session('success') }}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                    </div>
-                                @endif
+                    <div class="bg-light p-3 rounded mb-4">
+                        <div class="text-decoration-line-through text-muted">
+                            RM {{ number_format($product->price * 1.5, 2) }}
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="h2 text-danger mb-0">RM {{ number_format($product->price, 2) }}</div>
+                            <span class="badge bg-danger">-33%</span>
+                        </div>
+                    </div>
 
-                                <!-- Error Alert -->
-                                @if($errors->any())
-                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                        @foreach ($errors->all() as $error)
-                                            <div>{{ $error }}</div>
-                                        @endforeach
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                    </div>
-                                @endif
-                            </div>
-
-                            <!-- Form Title -->
-                            <h2 class="text-primary text-center mb-3">View Product</h2>
-                            <p class="text-muted text-center">View and manage your product here.</p><hr>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="name" class="form-label fw-bold">Product Name:</label>
-                                        <input type="text" class="form-control" id="name" name="name" value="{{ $product->name }}" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="category_name" class="form-label fw-bold">Product Category:</label>
-                                        <input type="text" class="form-control" id="category_name" name="category_name"
-                                            value="{{ strtoupper($product->category->category_name ?? 'No Category') }}" readonly>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="description" class="form-label fw-bold">Product Description:</label>
-                                <textarea class="form-control" id="description" name="description" rows="1" readonly>{{ $product->description }}</textarea>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="price" class="form-label fw-bold">Product Price:</label>
-                                <input type="text" class="form-control" id="price" name="price" value="RM {{ $product->price }}" readonly>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="quantity" class="form-label fw-bold">Product Quantity:</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" id="quantity" name="quantity" min="1" value="{{ $product->quantity }} Units" readonly>
-                                    <a href="{{ route('product.stock', $product->id) }}" class="btn btn-success w-25">Stock</a>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="zone_id" class="form-label fw-bold">Select Zone :</label>
-                                        <input type="text" class="form-control" id="zone_id" name="zone_id"
-                                               value="{{ strtoupper(optional($product->zone)->zone_name ?? 'No Zone') }}" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="rack_id" class="form-label fw-bold">Select Rack :</label>
-                                        <input type="text" class="form-control" id="rack_id" name="rack_id"
-                                               value="{{ strtoupper(optional($product->rack)->rack_number ?? 'No Rack') }}" readonly>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="sku_code" class="form-label fw-bold">Product SKU:</label>
-                                <input type="text" class="form-control text-uppercase" id="sku_code" name="sku_code" value="{{ $product->sku_code }}" readonly>
-                            </div>
-
-                            <div class="mb-5">
-                                <label for="barcode-number" class="form-label fw-bold me-2">Barcode Number:</label>
-                                <div class="d-flex flex-column align-items-center">
-                                    <img src="{{ $product->barcode ? asset('assets/' . $product->barcode->barcode_image) : '' }}"
-                                         alt="{{ $product->sku_code }}" class="img-fluid" style="max-width: 200px;">
-                                    <span class="fw-bold fs-5 mt-2">{{ $product->barcode ? $product->barcode->barcode_number : 'No Barcode' }}</span>
-                                </div>
-                            </div>
-
-                            @if ($product->images)
-                                <div class="row mt-3 d-flex flex-wrap justify-content-center">
-                                    @foreach ($product->images as $image)
-                                        <div class="col-sm-12 col-md-6 col-lg-2 m-2 d-flex justify-content-center align-items-center">
-                                            <div class="position-relative">
-                                                <img src="{{ asset('assets/' . $image->image) }}" alt="Image" class="img-fluid" style="max-width: 100%; max-height: 300px; object-fit: contain;">
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @endif
-
-                            <div class="mt-3 d-flex justify-content-between">
-                                <a href="{{ route('product.update', $product->id) }}" class="btn btn-warning w-50 me-2">Edit</a>
-
-                                <form action="{{ route('product.destroy', $product->id)}}" method="POST" onsubmit="return confirm('Are you sure you want to delete this product?');" class="w-50">
-                                    @csrf
-                                    @method('DELETE')
-
-                                    <button type="submit" class="btn btn-danger w-100">Delete</button>
-                                </form>
+                    <div class="row g-3">
+                        <!-- 基本信息 -->
+                        <div class="col-12">
+                            <div class="d-flex border-bottom py-2">
+                                <div class="text-muted label-width">SKU</div>
+                                <div class="fw-500">{{ $product->sku_code }}</div>
                             </div>
                         </div>
+
+                        <div class="col-12">
+                            <div class="d-flex border-bottom py-2">
+                                <div class="text-muted label-width">Category</div>
+                                <div class="fw-500">{{ strtoupper($product->category->category_name ?? 'No Category') }}</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="d-flex border-bottom py-2">
+                                <div class="text-muted label-width">Subcategory</div>
+                                <div class="fw-500">{{ strtoupper($product->subcategory->subcategory_name ?? 'No Subcategory') }}</div>
+                            </div>
+                        </div>
+
+                        <!-- 产品属性 -->
+                        <div class="col-12">
+                            <div class="d-flex border-bottom py-2">
+                                <div class="text-muted label-width">Brand</div>
+                                <div class="fw-500">{{ strtoupper(optional($product->brand)->brand_name ?? 'No Brand') }}</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="d-flex border-bottom py-2">
+                                <div class="text-muted label-width">Color</div>
+                                <div class="fw-500 d-flex align-items-center gap-2">
+                                    @if($product->color && $product->color->hex_code)
+                                        <div class="color-preview" style="background-color: {{ $product->color->hex_code }};"></div>
+                                    @endif
+                                    {{ strtoupper(optional($product->color)->color_name ?? 'No Color') }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 库存信息 -->
+                        <div class="col-12">
+                            <div class="d-flex border-bottom py-2">
+                                <div class="text-muted label-width">Stock</div>
+                                <div class="fw-500">{{ $product->quantity }} Units</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="d-flex border-bottom py-2">
+                                <div class="text-muted label-width">Location</div>
+                                <div class="fw-500">
+                                    Zone: {{ strtoupper(optional($product->zone)->zone_name ?? 'No Zone') }} |
+                                    Rack: {{ strtoupper(optional($product->rack)->rack_number ?? 'No Rack') }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 详细描述 -->
+                        <div class="col-12">
+                            <div class="d-flex border-bottom py-2">
+                                <div class="text-muted label-width">Description</div>
+                                <div class="fw-500">{{ $product->description }}</div>
+                            </div>
+                        </div>
+
+                        <!-- 条形码信息 -->
+                        @if($product->barcode)
+                            <div class="col-12">
+                                <div class="d-flex border-bottom py-2">
+                                    <div class="text-muted label-width">Barcode</div>
+                                    <div class="fw-500">
+                                        <div class="text-center">
+                                            <img src="{{ asset('assets/images/products/' . $product->barcode->barcode_image) }}"
+                                                 alt="{{ $product->sku_code }}"
+                                                 class="img-fluid barcode-image">
+                                            <div class="mt-2">
+                                                {{ $product->barcode->barcode_number }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="d-flex gap-3 mt-4">
+                        <a href="{{ route('product.edit', $product->id) }}"
+                           class="btn btn-outline-warning btn-lg flex-grow-1">
+                            <i class="bi bi-pencil me-2"></i>Edit Product
+                        </a>
+                        <form action="{{ route('product.destroy', $product->id)}}" method="POST"
+                              onsubmit="return confirm('Are you sure you want to delete this product?');"
+                              class="flex-grow-1">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-lg w-100">
+                                <i class="bi bi-trash me-2"></i>Delete Product
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+function changeImage(src) {
+    document.getElementById('mainImage').src = src;
+
+    // Update thumbnail active state
+    document.querySelectorAll('[onclick="changeImage(this.src)"]').forEach(thumb => {
+        if (thumb.src === src) {
+            thumb.classList.add('border-primary', 'border-2');
+        } else {
+            thumb.classList.remove('border-primary', 'border-2');
+        }
+    });
+}
+</script>
 @endsection

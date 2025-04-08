@@ -6,6 +6,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Product\Product;
 
 class User extends Authenticatable
 {
@@ -53,5 +55,9 @@ class User extends Authenticatable
 
     public function isStaff(): bool {
         return $this->role === 'staff';
+    }
+
+    public function products(): HasMany {
+        return $this->hasMany(Product::class);
     }
 }

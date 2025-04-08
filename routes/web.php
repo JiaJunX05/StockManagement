@@ -4,14 +4,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 // use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\Admin\Storage\ZoneController;
-use App\Http\Controllers\Admin\Storage\RackController;
-use App\Http\Controllers\Admin\Storage\LocationController;
-use App\Http\Controllers\Admin\Master\Category\CategoryController;
-use App\Http\Controllers\Admin\Master\Category\SubCategoryController;
-use App\Http\Controllers\Admin\Master\Category\MappingController;
-use App\Http\Controllers\Admin\Master\BrandController;
-use App\Http\Controllers\Admin\Master\ColorController;
+use App\Http\Controllers\Admin\StorageLocations\ZoneController;
+use App\Http\Controllers\Admin\StorageLocations\RackController;
+use App\Http\Controllers\Admin\StorageLocations\LocationController;
+use App\Http\Controllers\Admin\CategoryMappings\CategoryController;
+use App\Http\Controllers\Admin\CategoryMappings\SubCategoryController;
+use App\Http\Controllers\Admin\CategoryMappings\MappingController;
+use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\ColorController;
 use App\Http\Controllers\Admin\ProductController;
 
 // Guest routes
@@ -101,31 +101,38 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function() {
     Route::put('/color/update/{id}', [ColorController::class, 'update'])->name('color.update');
     Route::delete('/color/destroy/{id}', [ColorController::class, 'destroy'])->name('color.destroy');
 
+    // Create Product
+    Route::get('/product/index', [ProductController::class, 'index'])->name('product.index');
+    Route::get('/product/create', [ProductController::class, 'create'])->name('product.create');
+    Route::post('/product/store', [ProductController::class, 'store'])->name('product.store');
+    Route::get('/product/view/{id}', [ProductController::class, 'view'])->name('product.view');
+    Route::get('/product/edit/{id}', [ProductController::class, 'edit'])->name('product.edit');
+    Route::put('/product/update/{id}', [ProductController::class, 'update'])->name('product.update');
+    Route::delete('/product/destroy/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
 
-
-    // Add Product
-    Route::get('/product/list', [ProductController::class, 'index'])->name('product.list');
-    Route::get('/product/create', [ProductController::class, 'showCreateForm'])->name('product.create');
-    Route::post('/product/create', [ProductController::class, 'create'])->name('product.create.submit');
-    Route::get('.product/view/{id}', [ProductController::class, 'view'])->name('product.view');
-    Route::get('/product/stock/{id}', [ProductController::class, 'showStockForm'])->name('product.stock');
-    Route::put('/product/stock/{id}', [ProductController::class, 'stockUpdate'])->name('product.stock.submit');
-    Route::get('/product/update/{id}', [ProductController::class, 'showUpdateForm'])->name('product.update');
-    Route::put('/product/update/{id}', [ProductController::class, 'update'])->name('product.update.submit');
-    Route::delete('/product/delete/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
+    // // Add Product
+    // Route::get('/product/list', [ProductController::class, 'index'])->name('product.list');
+    // Route::get('/product/create', [ProductController::class, 'showCreateForm'])->name('product.create');
+    // Route::post('/product/create', [ProductController::class, 'create'])->name('product.create.submit');
+    // Route::get('/product/view/{id}', [ProductController::class, 'view'])->name('product.view');
+    // Route::get('/product/stock/{id}', [ProductController::class, 'showStockForm'])->name('product.stock');
+    // Route::put('/product/stock/{id}', [ProductController::class, 'stockUpdate'])->name('product.stock.submit');
+    // Route::get('/product/update/{id}', [ProductController::class, 'showUpdateForm'])->name('product.update');
+    // Route::put('/product/update/{id}', [ProductController::class, 'update'])->name('product.update.submit');
+    // Route::delete('/product/delete/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
 });
 
 Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function() {
     Route::get('/dashboard', [AuthController::class, 'index'])->name('staff.dashboard');
 
-    // Add Product
-    Route::get('/product/list', [ProductController::class, 'index'])->name('list');
-    Route::get('/product/create', [ProductController::class, 'showCreateForm'])->name('create');
-    Route::post('/product/create', [ProductController::class, 'create'])->name('create.submit');
-    Route::get('.product/view/{id}', [ProductController::class, 'view'])->name('view');
-    Route::get('/product/stock/{id}', [ProductController::class, 'showStockForm'])->name('stock');
-    Route::put('/product/stock/{id}', [ProductController::class, 'stockUpdate'])->name('stock.submit');
-    Route::get('/product/update/{id}', [ProductController::class, 'showUpdateForm'])->name('update');
-    Route::put('/product/update/{id}', [ProductController::class, 'update'])->name('update.submit');
-    // Route::delete('/product/delete/{id}', [ProductController::class, 'destroy'])->name('destroy');
+    // // Add Product
+    // Route::get('/product/list', [ProductController::class, 'index'])->name('list');
+    // Route::get('/product/create', [ProductController::class, 'showCreateForm'])->name('create');
+    // Route::post('/product/create', [ProductController::class, 'create'])->name('create.submit');
+    // Route::get('.product/view/{id}', [ProductController::class, 'view'])->name('view');
+    // Route::get('/product/stock/{id}', [ProductController::class, 'showStockForm'])->name('stock');
+    // Route::put('/product/stock/{id}', [ProductController::class, 'stockUpdate'])->name('stock.submit');
+    // Route::get('/product/update/{id}', [ProductController::class, 'showUpdateForm'])->name('update');
+    // Route::put('/product/update/{id}', [ProductController::class, 'update'])->name('update.submit');
+    // // Route::delete('/product/delete/{id}', [ProductController::class, 'destroy'])->name('destroy');
 });

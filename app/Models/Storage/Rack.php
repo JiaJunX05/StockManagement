@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use App\Models\Storage\Zone;
 use App\Models\Storage\Location;
-use App\Models\Product;
+use App\Models\Product\Product;
 
 class Rack extends Model
 {
